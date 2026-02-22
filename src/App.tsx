@@ -15,7 +15,7 @@ import {
   densityOptions, fontStyles, fontSizes, layoutTypes,
   navigationStyles, animationOptions, componentOptions,
   pageOptions, feedbackOptions, languageOptions, toneOptions,
-} from './data/options';
+} from './data/options/options';
 import { generatePrompt } from './generators/generatePrompt';
 import { generateLandingPagePrompt } from './generators/generateLandingPagePrompt';
 import { generateDevPrompt } from './generators/generateDevPrompt';

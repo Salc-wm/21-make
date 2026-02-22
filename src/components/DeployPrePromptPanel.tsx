@@ -1,7 +1,7 @@
 import { useState, memo } from 'react';
 import { Sparkles, ChevronRight, Search, X, Container } from 'lucide-react';
-import { deployPrePrompts, applyDeployPrePrompt } from '../data/deployPrePrompts';
-import type { DeployPrePrompt } from '../data/deployPrePrompts';
+import { deployPrePrompts, applyDeployPrePrompt } from '../data/prePrompts/deployPrePrompts';
+import type { DeployPrePrompt } from '../data/prePrompts/deployPrePrompts';
 import type { DeployPromptConfig } from '../deployTypes';
 
 interface DeployPrePromptPanelProps {

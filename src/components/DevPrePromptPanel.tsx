@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Sparkles, ChevronRight, Search, X, Terminal } from 'lucide-react';
-import { devPrePrompts, applyDevPrePrompt } from '../data/devPrePrompts';
-import type { DevPrePrompt } from '../data/devPrePrompts';
+import { devPrePrompts, applyDevPrePrompt } from '../data/prePrompts/devPrePrompts';
+import type { DevPrePrompt } from '../data/prePrompts/devPrePrompts';
 import type { DevPromptConfig } from '../devTypes';
 
 interface DevPrePromptPanelProps {

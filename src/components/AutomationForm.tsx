@@ -4,7 +4,7 @@ import type { AutomationPromptConfig } from '../automationTypes';
 import {
   automationPlatforms, automationTypes, triggerTypes,
   coreNodes, authRequirements, errorHandlingOptions, retryOptions
-} from '../data/automationOptions';
+} from '../data/options/automationOptions';
 import { SectionCard } from './SectionCard';
 import { TextField } from './TextField';
 import { OptionCards } from './OptionCards';

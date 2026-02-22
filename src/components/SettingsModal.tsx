@@ -3,8 +3,8 @@ import { X, Settings2, Globe, FileText, Code } from 'lucide-react';
 import { t } from '../core/PromptBuilder';
 import { TextField } from './TextField';
 import { SelectField } from './SelectField';
-import { appTypes, languageOptions } from '../data/options';
-import { aiEditors, packageManagers, deployTargets } from '../data/devOptions';
+import { appTypes, languageOptions } from '../data/options/options';
+import { aiEditors, packageManagers, deployTargets } from '../data/options/devOptions';
 
 export interface GlobalSettings {
   projectName: string;

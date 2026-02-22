@@ -1,5 +1,5 @@
-import type { DeployPromptConfig } from '../deployTypes';
-import { defaultDeployConfig } from '../deployTypes';
+import type { DeployPromptConfig } from '../../deployTypes';
+import { defaultDeployConfig } from '../../deployTypes';
 
 export interface DeployPrePrompt {
   id: string;
@@ -9,7 +9,7 @@ export interface DeployPrePrompt {
   config: Partial<DeployPromptConfig>;
 }
 
-import deployPrePromptsData from './deployPrePrompts.json';
+import deployPrePromptsData from '../json/deployPrePrompts.json';
 
 export const deployPrePrompts: DeployPrePrompt[] = deployPrePromptsData as DeployPrePrompt[];
 

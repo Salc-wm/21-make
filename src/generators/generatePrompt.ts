@@ -5,7 +5,7 @@ import {
   layoutTypes, navigationStyles, animationOptions, toneOptions,
   languageOptions, componentOptions as componentOptionsList,
   pageOptions as pageOptionsList,
-} from '../data/options';
+} from '../data/options/options';
 import { PromptBuilder, t } from '../core/PromptBuilder';
 
 export function generatePrompt(config: PromptConfig): string {

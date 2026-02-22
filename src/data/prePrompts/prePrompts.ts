@@ -1,5 +1,5 @@
-import type { PromptConfig } from '../types';
-import { defaultConfig } from '../types';
+import type { PromptConfig } from '../../types';
+import { defaultConfig } from '../../types';
 
 export interface PrePrompt {
   id: string;
@@ -22,7 +22,7 @@ export const prePromptCategories: { value: string; label: string; emoji: string 
   { value: 'social', label: 'Social', emoji: '👥' },
 ];
 
-import prePromptsData from './prePrompts.json';
+import prePromptsData from '../json/prePrompts.json';
 
 export const prePrompts: PrePrompt[] = prePromptsData as PrePrompt[];
 

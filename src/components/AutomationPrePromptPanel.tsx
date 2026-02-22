@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Sparkles, ChevronRight, Search, X, Package } from 'lucide-react';
-import { automationPrePrompts, automationPrePromptCategories, applyAutomationPrePrompt } from '../data/automationPrePrompts';
-import type { AutomationPrePrompt } from '../data/automationPrePrompts';
+import { automationPrePrompts, automationPrePromptCategories, applyAutomationPrePrompt } from '../data/prePrompts/automationPrePrompts';
+import type { AutomationPrePrompt } from '../data/prePrompts/automationPrePrompts';
 import type { AutomationPromptConfig } from '../automationTypes';
 
 interface AutomationPrePromptPanelProps {

@@ -11,7 +11,7 @@ import {
   reverseProxies, sslMethods, ciCdOptions, registryOptions,
   healthcheckOptions, loggingOptions, backupStrategies,
   deployAutomationPlatforms, queueSystems, workflowScaling,
-} from '../data/deployOptions';
+} from '../data/options/deployOptions';
 import { SectionCard } from './SectionCard';
 import { SelectField } from './SelectField';
 import { TextField } from './TextField';

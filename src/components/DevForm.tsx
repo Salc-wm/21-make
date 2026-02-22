@@ -11,7 +11,7 @@ import {
   apiTypes, authApproaches, databases, packageManagers,
   testingOptions, codeQualityOptions, aiEditors, deployTargets,
   automationPlatforms, automationTriggers, automationGateways, automationConnectors,
-} from '../data/devOptions';
+} from '../data/options/devOptions';
 import { SectionCard } from './SectionCard';
 import { SelectField } from './SelectField';
 import { TextField } from './TextField';

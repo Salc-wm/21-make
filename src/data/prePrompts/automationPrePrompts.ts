@@ -1,5 +1,5 @@
-import type { AutomationPromptConfig } from '../automationTypes';
-import { defaultAutomationConfig } from '../automationTypes';
+import type { AutomationPromptConfig } from '../../automationTypes';
+import { defaultAutomationConfig } from '../../automationTypes';
 
 export interface AutomationPrePrompt {
   id: string;
@@ -18,7 +18,7 @@ export const automationPrePromptCategories = [
   { value: 'data', label: 'Dados', emoji: '📊' }
 ];
 
-import automationPrePromptsData from './automationPrePrompts.json';
+import automationPrePromptsData from '../json/automationPrePrompts.json';
 
 export const automationPrePrompts: AutomationPrePrompt[] = automationPrePromptsData as AutomationPrePrompt[];
 

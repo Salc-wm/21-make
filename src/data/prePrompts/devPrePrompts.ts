@@ -1,5 +1,5 @@
-import type { DevPromptConfig } from '../devTypes';
-import { defaultDevConfig } from '../devTypes';
+import type { DevPromptConfig } from '../../devTypes';
+import { defaultDevConfig } from '../../devTypes';
 
 export interface DevPrePrompt {
   id: string;
@@ -9,7 +9,7 @@ export interface DevPrePrompt {
   config: Partial<DevPromptConfig>;
 }
 
-import devPrePromptsData from './devPrePrompts.json';
+import devPrePromptsData from '../json/devPrePrompts.json';
 
 export const devPrePrompts: DevPrePrompt[] = devPrePromptsData as DevPrePrompt[];
 

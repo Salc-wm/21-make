@@ -7,7 +7,7 @@ import {
   apiTypes, authApproaches, databases, packageManagers,
   testingOptions, codeQualityOptions, aiEditors, deployTargets,
   automationPlatforms, automationTriggers, automationGateways, automationConnectors,
-} from '../data/devOptions';
+} from '../data/options/devOptions';
 import { PromptBuilder, t } from '../core/PromptBuilder';
 
 export function generateDevPrompt(config: DevPromptConfig, inheritedDesign?: DesignPromptConfig): string {

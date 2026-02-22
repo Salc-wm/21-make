@@ -7,7 +7,7 @@ import {
   reverseProxies, sslMethods, ciCdOptions, registryOptions,
   healthcheckOptions, loggingOptions, backupStrategies,
   deployAutomationPlatforms, queueSystems, workflowScaling,
-} from '../data/deployOptions';
+} from '../data/options/deployOptions';
 import { PromptBuilder, t, getLabel } from '../core/PromptBuilder';
 
 export function generateDeployPrompt(config: DeployPromptConfig, inheritedDev?: DevPromptConfig): string {

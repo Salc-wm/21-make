@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Sparkles, ChevronRight, Search, X, Package } from 'lucide-react';
-import { prePrompts, prePromptCategories, applyPrePrompt } from '../data/prePrompts';
-import type { PrePrompt } from '../data/prePrompts';
+import { prePrompts, prePromptCategories, applyPrePrompt } from '../data/prePrompts/prePrompts';
+import type { PrePrompt } from '../data/prePrompts/prePrompts';
 import type { PromptConfig } from '../types';
 
 interface PrePromptPanelProps {

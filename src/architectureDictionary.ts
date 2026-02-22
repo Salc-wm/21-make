@@ -8,21 +8,21 @@ import {
   densityOptions, fontStyles, fontSizes, layoutTypes,
   navigationStyles, animationOptions, languageOptions, toneOptions,
   pageOptions, colorSchemes, componentOptions,
-} from './data/options';
+} from './data/options/options';
 import {
   frameworks, devLanguages, cssApproaches, stateManagementOptions,
   designPatterns, componentPatterns, routingApproaches, fileOrganizations,
   apiTypes, authApproaches, databases, packageManagers,
   testingOptions, codeQualityOptions, aiEditors, deployTargets,
   automationPlatforms, automationTriggers, automationGateways, automationConnectors,
-} from './data/devOptions';
+} from './data/options/devOptions';
 import {
   projectTypes, targetOSOptions, environmentTypes,
   containerPlatforms, baseImages, nodeVersions, serveMethods,
   reverseProxies, sslMethods, ciCdOptions, registryOptions,
   healthcheckOptions, loggingOptions, backupStrategies,
   deployAutomationPlatforms, queueSystems, workflowScaling,
-} from './data/deployOptions';
+} from './data/options/deployOptions';
 
 // ── Unified Architecture Dictionary ───────────────
 export interface ArchitectureDictionary {

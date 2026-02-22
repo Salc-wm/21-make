@@ -1,4 +1,4 @@
-import { colorSchemes } from '../data/options';
+import { colorSchemes } from '../data/options/options';
 
 interface ColorSchemeSelectorProps {
   value: string;
