@@ -3,25 +3,13 @@ import type { DevPromptConfig } from './devTypes';
 import type { DeployPromptConfig } from './deployTypes';
 import { getLabel } from './core/PromptBuilder';
 import {
-  appTypes, appPageTypeOptions,
-  designStyles, darkModeOptions, borderRadiusOptions,
-  densityOptions, fontStyles, fontSizes, layoutTypes,
-  navigationStyles, animationOptions, languageOptions, toneOptions,
-  pageOptions, colorSchemes, componentOptions,
+  getAppTypes, getAppPageTypeOptions, getDesignStyles, getDarkModeOptions, getBorderRadiusOptions, getDensityOptions, getFontStyles, getFontSizes, getLayoutTypes, getNavigationStyles, getAnimationOptions, getLanguageOptions, getToneOptions, getPageOptions, getColorSchemes, getComponentOptions
 } from './data/options/options';
 import {
-  frameworks, devLanguages, cssApproaches, stateManagementOptions,
-  designPatterns, componentPatterns, routingApproaches, fileOrganizations,
-  apiTypes, authApproaches, databases, packageManagers,
-  testingOptions, codeQualityOptions, aiEditors, deployTargets,
-  automationPlatforms, automationTriggers, automationGateways, automationConnectors,
+  getFrameworks, getDevLanguages, getCssApproaches, getStateManagementOptions, getDesignPatterns, getComponentPatterns, getRoutingApproaches, getFileOrganizations, getApiTypes, getAuthApproaches, getDatabases, getPackageManagers, getTestingOptions, getCodeQualityOptions, getAiEditors, getDeployTargets, getAutomationPlatforms, getAutomationTriggers, getAutomationGateways, getAutomationConnectors
 } from './data/options/devOptions';
 import {
-  projectTypes, targetOSOptions, environmentTypes,
-  containerPlatforms, baseImages, nodeVersions, serveMethods,
-  reverseProxies, sslMethods, ciCdOptions, registryOptions,
-  healthcheckOptions, loggingOptions, backupStrategies,
-  deployAutomationPlatforms, queueSystems, workflowScaling,
+  getProjectTypes, getTargetOSOptions, getEnvironmentTypes, getContainerPlatforms, getBaseImages, getNodeVersions, getServeMethods, getReverseProxies, getSslMethods, getCiCdOptions, getRegistryOptions, getHealthcheckOptions, getLoggingOptions, getBackupStrategies, getDeployAutomationPlatforms, getQueueSystems, getWorkflowScaling
 } from './data/options/deployOptions';
 
 // ── Unified Architecture Dictionary ───────────────
@@ -121,6 +109,7 @@ export interface ArchitectureDictionary {
     automationConfig: import('./automationTypes').AutomationPromptConfig
   ): ArchitectureDictionary {
     const isPT = (config.promptLanguage || 'pt') === 'pt';
+    const lang: import('./core/i18n').Lang = isPT ? 'pt' : 'en';
 
     // Parse custom pages
     const customPages = config.customPages ? config.customPages.split(',').map(p => p.trim()).filter(Boolean) : [];
@@ -131,8 +120,8 @@ export interface ArchitectureDictionary {
         description: config.projectDescription || devConfig.projectDescription || deployConfig.projectDescription || automationConfig.projectDescription || '',
         generatedAt: new Date().toISOString(),
         language: config.promptLanguage || 'pt',
-        appType: getLabel(appTypes, config.appType),
-        appPageType: getLabel(appPageTypeOptions, config.appPageType),
+        appType: getLabel(getAppTypes(lang), config.appType),
+        appPageType: getLabel(getAppPageTypeOptions(lang), config.appPageType),
         numberOfPages: config.numberOfPages,
         sessionDetails: config.sessionDetails,
         guidelines: isPT ? [
@@ -150,9 +139,9 @@ export interface ArchitectureDictionary {
         ],
       },
       design: {
-        style: getLabel(designStyles, config.designStyle),
+        style: getLabel(getDesignStyles(lang), config.designStyle),
         colorScheme: (() => {
-          const scheme = colorSchemes.find(c => c.value === config.colorScheme);
+          const scheme = getColorSchemes(lang).find(c => c.value === config.colorScheme);
           if (!scheme) return config.colorScheme || '';
           if (scheme.colors && scheme.colors.length > 0) {
             return `${scheme.label} (${scheme.colors.join(', ')})`;
@@ -163,23 +152,23 @@ export interface ArchitectureDictionary {
           return scheme.label;
         })(),
         primaryColor: config.primaryColor,
-        darkMode: getLabel(darkModeOptions, config.darkMode),
-        borderRadius: getLabel(borderRadiusOptions, config.borderRadius),
-        density: getLabel(densityOptions, config.density),
+        darkMode: getLabel(getDarkModeOptions(lang), config.darkMode),
+        borderRadius: getLabel(getBorderRadiusOptions(lang), config.borderRadius),
+        density: getLabel(getDensityOptions(lang), config.density),
         typography: {
-          family: getLabel(fontStyles, config.fontStyle),
-          size: getLabel(fontSizes, config.fontSize),
+          family: getLabel(getFontStyles(lang), config.fontStyle),
+          size: getLabel(getFontSizes(lang), config.fontSize),
         },
         layout: {
-          type: getLabel(layoutTypes, config.layoutType),
-          navigation: getLabel(navigationStyles, config.navigationStyle),
+          type: getLabel(getLayoutTypes(lang), config.layoutType),
+          navigation: getLabel(getNavigationStyles(lang), config.navigationStyle),
           sidebarPosition: config.sidebarPosition === 'left' ? (isPT ? 'Esquerda' : 'Left') : (isPT ? 'Direita' : 'Right'),
           responsiveness: config.responsiveness === 'fully-responsive' ? (isPT ? 'Totalmente responsivo' : 'Fully responsive') : (isPT ? 'Desktop-first com adaptação mobile' : 'Desktop-first with mobile adaptation'),
         },
         pages: (() => {
           const allP: { name: string; description?: string; elements?: string; notes?: string }[] = [];
           config.pages.forEach(p => {
-            const label = getLabel(pageOptions, p);
+            const label = getLabel(getPageOptions(lang), p);
             const d = config.pageDetails?.[p];
             allP.push({ name: label, description: d?.description, elements: d?.components, notes: d?.notes });
           });
@@ -189,14 +178,14 @@ export interface ArchitectureDictionary {
           });
           return allP;
         })(),
-        components: config.components.map(c => getLabel(componentOptions, c)),
+        components: config.components.map(c => getLabel(getComponentOptions(lang), c)),
         interactions: {
-          animations: getLabel(animationOptions, config.animations),
+          animations: getLabel(getAnimationOptions(lang), config.animations),
           feedback: config.feedback,
         },
         tone: {
-          language: getLabel(languageOptions, config.language),
-          tone: getLabel(toneOptions, config.tone),
+          language: getLabel(getLanguageOptions(lang), config.language),
+          tone: getLabel(getToneOptions(lang), config.tone),
           rules: isPT ? [
             'Textos curtos e diretos (microcopy eficaz)',
             'Labels descritivos e ações claras nos botões'
@@ -223,27 +212,27 @@ export interface ArchitectureDictionary {
         ],
       },
       development: {
-        framework: getLabel(frameworks, devConfig.framework),
-        language: getLabel(devLanguages, devConfig.language),
-        css: getLabel(cssApproaches, devConfig.cssApproach),
-        packageManager: getLabel(packageManagers, devConfig.packageManager),
+        framework: getLabel(getFrameworks(lang), devConfig.framework),
+        language: getLabel(getDevLanguages(lang), devConfig.language),
+        css: getLabel(getCssApproaches(lang), devConfig.cssApproach),
+        packageManager: getLabel(getPackageManagers(lang), devConfig.packageManager),
         architecture: {
-          stateManagement: getLabel(stateManagementOptions, devConfig.stateManagement),
-          designPattern: getLabel(designPatterns, devConfig.designPattern),
-          componentPattern: getLabel(componentPatterns, devConfig.componentPattern),
-          routing: getLabel(routingApproaches, devConfig.routingApproach),
-          fileOrganization: getLabel(fileOrganizations, devConfig.fileOrganization),
+          stateManagement: getLabel(getStateManagementOptions(lang), devConfig.stateManagement),
+          designPattern: getLabel(getDesignPatterns(lang), devConfig.designPattern),
+          componentPattern: getLabel(getComponentPatterns(lang), devConfig.componentPattern),
+          routing: getLabel(getRoutingApproaches(lang), devConfig.routingApproach),
+          fileOrganization: getLabel(getFileOrganizations(lang), devConfig.fileOrganization),
         },
         api: {
-          type: getLabel(apiTypes, devConfig.apiType),
-          auth: getLabel(authApproaches, devConfig.authApproach),
-          database: getLabel(databases, devConfig.database),
+          type: getLabel(getApiTypes(lang), devConfig.apiType),
+          auth: getLabel(getAuthApproaches(lang), devConfig.authApproach),
+          database: getLabel(getDatabases(lang), devConfig.database),
         },
         quality: {
-          testing: devConfig.testing.map(v => getLabel(testingOptions, v)),
-          codeQuality: devConfig.codeQuality.map(v => getLabel(codeQualityOptions, v)),
+          testing: devConfig.testing.map(v => getLabel(getTestingOptions(lang), v)),
+          codeQuality: devConfig.codeQuality.map(v => getLabel(getCodeQualityOptions(lang), v)),
         },
-        aiEditor: getLabel(aiEditors, devConfig.aiEditor),
+        aiEditor: getLabel(getAiEditors(lang), devConfig.aiEditor),
         aiInstructions: devConfig.aiInstructions || '',
         rules: isPT ? [
           'Implementa o design pixel-perfect seguindo as imagens/referências de design fornecidas',
@@ -268,56 +257,56 @@ export interface ArchitectureDictionary {
           'Proper error and edge case handling — loading, empty, error states',
           'Clean and readable code — no duplication, short functions, single responsibility'
         ],
-        deployTarget: getLabel(deployTargets, devConfig.deployTarget),
+        deployTarget: getLabel(getDeployTargets(lang), devConfig.deployTarget),
         automation: {
-          platform: getLabel(automationPlatforms, devConfig.automationPlatform),
-          triggers: devConfig.automationTriggers.map(v => getLabel(automationTriggers, v)),
-          gateways: devConfig.automationGateways.map(v => getLabel(automationGateways, v)),
-          connector: getLabel(automationConnectors, devConfig.automationConnector),
+          platform: getLabel(getAutomationPlatforms(lang), devConfig.automationPlatform),
+          triggers: devConfig.automationTriggers.map(v => getLabel(getAutomationTriggers(lang), v)),
+          gateways: devConfig.automationGateways.map(v => getLabel(getAutomationGateways(lang), v)),
+          connector: getLabel(getAutomationConnectors(lang), devConfig.automationConnector),
           workflow: devConfig.automationWorkflow,
         },
       },
       deployment: {
-        projectType: getLabel(projectTypes, deployConfig.projectType),
+        projectType: getLabel(getProjectTypes(lang), deployConfig.projectType),
         environment: {
-          os: getLabel(targetOSOptions, deployConfig.targetOS),
-          type: getLabel(environmentTypes, deployConfig.environmentType),
+          os: getLabel(getTargetOSOptions(lang), deployConfig.targetOS),
+          type: getLabel(getEnvironmentTypes(lang), deployConfig.environmentType),
           vmProvider: deployConfig.vmProvider,
         },
         container: {
-          platform: getLabel(containerPlatforms, deployConfig.containerPlatform),
-          baseImage: getLabel(baseImages, deployConfig.baseImage),
+          platform: getLabel(getContainerPlatforms(lang), deployConfig.containerPlatform),
+          baseImage: getLabel(getBaseImages(lang), deployConfig.baseImage),
           customImage: deployConfig.customBaseImage,
         },
         build: {
-          nodeVersion: getLabel(nodeVersions, deployConfig.nodeVersion),
+          nodeVersion: getLabel(getNodeVersions(lang), deployConfig.nodeVersion),
           buildCommand: deployConfig.buildCommand,
           outputDir: deployConfig.outputDir,
-          serveWith: getLabel(serveMethods, deployConfig.serveWith),
+          serveWith: getLabel(getServeMethods(lang), deployConfig.serveWith),
           envVars: deployConfig.envVars,
         },
         networking: {
           port: deployConfig.exposedPort,
-          reverseProxy: getLabel(reverseProxies, deployConfig.reverseProxy),
-          ssl: getLabel(sslMethods, deployConfig.sslMethod),
+          reverseProxy: getLabel(getReverseProxies(lang), deployConfig.reverseProxy),
+          ssl: getLabel(getSslMethods(lang), deployConfig.sslMethod),
           domain: deployConfig.domain,
         },
         storage: {
           volumes: deployConfig.volumes,
-          backup: getLabel(backupStrategies, deployConfig.backupStrategy),
+          backup: getLabel(getBackupStrategies(lang), deployConfig.backupStrategy),
         },
         cicd: {
-          pipeline: getLabel(ciCdOptions, deployConfig.ciCd),
-          registry: getLabel(registryOptions, deployConfig.registry),
+          pipeline: getLabel(getCiCdOptions(lang), deployConfig.ciCd),
+          registry: getLabel(getRegistryOptions(lang), deployConfig.registry),
         },
         monitoring: {
-          healthcheck: getLabel(healthcheckOptions, deployConfig.healthcheck),
-          logging: getLabel(loggingOptions, deployConfig.logging),
+          healthcheck: getLabel(getHealthcheckOptions(lang), deployConfig.healthcheck),
+          logging: getLabel(getLoggingOptions(lang), deployConfig.logging),
         },
         automation: {
-          platform: getLabel(deployAutomationPlatforms, deployConfig.automationPlatform),
-          queueSystem: getLabel(queueSystems, deployConfig.queueSystem),
-          scaling: getLabel(workflowScaling, deployConfig.workflowScaling),
+          platform: getLabel(getDeployAutomationPlatforms(lang), deployConfig.automationPlatform),
+          queueSystem: getLabel(getQueueSystems(lang), deployConfig.queueSystem),
+          scaling: getLabel(getWorkflowScaling(lang), deployConfig.workflowScaling),
           notes: deployConfig.automationNotes,
         },
       },
