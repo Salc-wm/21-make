@@ -1,0 +1,205 @@
+[
+  {
+    "id": "nextjs-tailwind-full",
+    "label": "Next.js + Tailwind (Full Stack)",
+    "description": "Stack moderno com App Router, TypeScript, Tailwind e Prisma",
+    "emoji": "▲",
+    "config": {
+      "framework": "nextjs",
+      "language": "typescript",
+      "cssApproach": "tailwind",
+      "packageManager": "pnpm",
+      "stateManagement": "zustand",
+      "componentPattern": "server-components",
+      "routingApproach": "app-router",
+      "fileOrganization": "nextjs-app",
+      "apiType": "server-actions",
+      "authApproach": "nextauth",
+      "database": "prisma",
+      "testing": [
+        "vitest",
+        "testing-library"
+      ],
+      "codeQuality": [
+        "eslint",
+        "prettier"
+      ],
+      "aiEditor": "generic",
+      "deployTarget": "vercel",
+      "extraNotes": "Usar Server Components por defeito, Client Components apenas quando necessário. Implementar loading.tsx e error.tsx em cada route group."
+    }
+  },
+  {
+    "id": "react-vite-spa",
+    "label": "React SPA (Vite)",
+    "description": "SPA rápida com React, Vite, TypeScript e CSS Modules",
+    "emoji": "⚛️",
+    "config": {
+      "framework": "react-vite",
+      "language": "typescript",
+      "cssApproach": "css-modules",
+      "packageManager": "npm",
+      "stateManagement": "zustand",
+      "componentPattern": "functional",
+      "routingApproach": "react-router",
+      "fileOrganization": "feature-based",
+      "apiType": "rest",
+      "authApproach": "none",
+      "database": "none",
+      "testing": [
+        "vitest",
+        "testing-library"
+      ],
+      "codeQuality": [
+        "eslint",
+        "prettier"
+      ],
+      "aiEditor": "generic",
+      "deployTarget": "netlify"
+    }
+  },
+  {
+    "id": "vue-nuxt",
+    "label": "Vue + Nuxt 3",
+    "description": "Nuxt 3 full-stack com Pinia, Tailwind e Supabase",
+    "emoji": "💚",
+    "config": {
+      "framework": "vue-nuxt",
+      "language": "typescript",
+      "cssApproach": "tailwind",
+      "packageManager": "pnpm",
+      "stateManagement": "pinia",
+      "componentPattern": "functional",
+      "routingApproach": "file-based",
+      "fileOrganization": "type-based",
+      "apiType": "rest",
+      "authApproach": "supabase-auth",
+      "database": "supabase",
+      "testing": [
+        "vitest"
+      ],
+      "codeQuality": [
+        "eslint",
+        "prettier"
+      ],
+      "aiEditor": "generic",
+      "deployTarget": "vercel"
+    }
+  },
+  {
+    "id": "sveltekit",
+    "label": "SvelteKit + Tailwind",
+    "description": "SvelteKit com TypeScript, Tailwind e deploy Vercel",
+    "emoji": "🔥",
+    "config": {
+      "framework": "svelte-kit",
+      "language": "typescript",
+      "cssApproach": "tailwind",
+      "packageManager": "pnpm",
+      "stateManagement": "signals",
+      "componentPattern": "functional",
+      "routingApproach": "file-based",
+      "fileOrganization": "feature-based",
+      "apiType": "rest",
+      "authApproach": "none",
+      "database": "none",
+      "testing": [
+        "vitest",
+        "playwright"
+      ],
+      "codeQuality": [
+        "eslint",
+        "prettier"
+      ],
+      "aiEditor": "generic",
+      "deployTarget": "vercel"
+    }
+  },
+  {
+    "id": "nextjs-supabase",
+    "label": "Next.js + Supabase",
+    "description": "Full-stack com Supabase Auth, DB e Realtime",
+    "emoji": "⚡",
+    "config": {
+      "framework": "nextjs",
+      "language": "typescript",
+      "cssApproach": "tailwind",
+      "packageManager": "pnpm",
+      "stateManagement": "context",
+      "componentPattern": "server-components",
+      "routingApproach": "app-router",
+      "fileOrganization": "nextjs-app",
+      "apiType": "server-actions",
+      "authApproach": "supabase-auth",
+      "database": "supabase",
+      "testing": [
+        "vitest"
+      ],
+      "codeQuality": [
+        "eslint",
+        "prettier",
+        "husky"
+      ],
+      "aiEditor": "generic",
+      "deployTarget": "vercel",
+      "extraNotes": "Usar Supabase Row Level Security (RLS) para proteção de dados. Implementar realtime subscriptions para dados que precisam de atualização automática."
+    }
+  },
+  {
+    "id": "antigravity-optimized",
+    "label": "Otimizado para Antigravity",
+    "description": "Prompt optimizado para o Antigravity AI Editor",
+    "emoji": "🚀",
+    "config": {
+      "framework": "nextjs",
+      "language": "typescript",
+      "cssApproach": "tailwind",
+      "packageManager": "npm",
+      "stateManagement": "zustand",
+      "componentPattern": "server-components",
+      "routingApproach": "app-router",
+      "fileOrganization": "nextjs-app",
+      "apiType": "server-actions",
+      "authApproach": "none",
+      "database": "none",
+      "testing": [],
+      "codeQuality": [
+        "eslint",
+        "prettier"
+      ],
+      "aiEditor": "antigravity",
+      "deployTarget": "vercel",
+      "aiInstructions": "Implementa cada componente num ficheiro separado. Usa absolute imports com @/ prefix. Cria os ficheiros na ordem correta (tipos → utils → componentes → páginas). Inclui comentários JSDoc nas funções exportadas. Segue as imagens de design pixel-perfect."
+    }
+  },
+  {
+    "id": "cursor-optimized",
+    "label": "Otimizado para Cursor",
+    "description": "Prompt optimizado para o Cursor AI Editor",
+    "emoji": "🖱️",
+    "config": {
+      "framework": "nextjs",
+      "language": "typescript",
+      "cssApproach": "tailwind",
+      "packageManager": "pnpm",
+      "stateManagement": "zustand",
+      "componentPattern": "functional",
+      "routingApproach": "app-router",
+      "fileOrganization": "nextjs-app",
+      "apiType": "server-actions",
+      "authApproach": "none",
+      "database": "prisma",
+      "testing": [
+        "vitest"
+      ],
+      "codeQuality": [
+        "eslint",
+        "prettier",
+        "biome"
+      ],
+      "aiEditor": "cursor",
+      "deployTarget": "vercel",
+      "aiInstructions": "Gera ficheiros completos sem truncar. Usa @file references quando necessário. Segue o .cursorrules se existir. Implementa error boundaries e loading states em todas as páginas."
+    }
+  }
+]
