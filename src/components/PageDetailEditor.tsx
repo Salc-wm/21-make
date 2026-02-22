@@ -1,4 +1,5 @@
 import { useState, memo } from 'react';
+import { t } from '../core/PromptBuilder';
 import { ChevronDown, ChevronUp, FileText, AlertCircle } from 'lucide-react';
 import { type PageDetail } from '../types';
 
@@ -8,9 +9,11 @@ interface PageDetailEditorProps {
   detail: PageDetail;
   onChange: (key: string, detail: PageDetail) => void;
   isCustom?: boolean;
+  lang: import('../core/i18n').Lang;
 }
 
-const PageDetailItem = memo(function PageDetailItem({ pageKey, pageName, detail, onChange, isCustom }: PageDetailEditorProps) {
+const PageDetailItem = memo(function PageDetailItem({ pageKey, pageName, detail, onChange, isCustom, lang }: PageDetailEditorProps) {
+  const strings = t(lang);
   const [isOpen, setIsOpen] = useState(false);
   const hasContent = detail.description || detail.components || detail.notes;
 
@@ -37,7 +40,7 @@ const PageDetailItem = memo(function PageDetailItem({ pageKey, pageName, detail,
         </div>
         <div className="flex items-center gap-2">
           {hasContent && (
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500" title="Tem detalhes preenchidos" />
+            <span className="flex h-2 w-2 rounded-full bg-emerald-500" title={strings.pageDetailHelper.split(' ')[0] + '...'} />
           )}
           {isOpen ? (
             <ChevronUp className="h-4 w-4 text-zinc-400" />
@@ -53,8 +56,8 @@ const PageDetailItem = memo(function PageDetailItem({ pageKey, pageName, detail,
           {/* Description */}
           <div>
             <label className="mb-1 block text-xs font-medium text-zinc-700 dark:text-zinc-300">
-              Descrição da Página
-              <span className="ml-1 text-zinc-400 font-normal">— O que esta página faz?</span>
+              {strings.pageDescTitle}
+              <span className="ml-1 text-zinc-400 font-normal">{strings.pageDescHint}</span>
             </label>
             <textarea
               value={detail.description}
@@ -68,8 +71,8 @@ const PageDetailItem = memo(function PageDetailItem({ pageKey, pageName, detail,
           {/* Key Components */}
           <div>
             <label className="mb-1 block text-xs font-medium text-zinc-700 dark:text-zinc-300">
-              Elementos / Componentes Principais
-              <span className="ml-1 text-zinc-400 font-normal">— O que deve estar visível?</span>
+              {strings.pageElementsTitle}
+              <span className="ml-1 text-zinc-400 font-normal">{strings.pageElementsHint}</span>
             </label>
             <input
               type="text"
@@ -83,8 +86,8 @@ const PageDetailItem = memo(function PageDetailItem({ pageKey, pageName, detail,
           {/* Extra Notes */}
           <div>
             <label className="mb-1 block text-xs font-medium text-zinc-700 dark:text-zinc-300">
-              Notas Específicas
-              <span className="ml-1 text-zinc-400 font-normal">— Comportamento, estados especiais, etc.</span>
+              {strings.pageNotesTitle}
+              <span className="ml-1 text-zinc-400 font-normal">{strings.pageNotesHint}</span>
             </label>
             <input
               type="text"
@@ -99,7 +102,7 @@ const PageDetailItem = memo(function PageDetailItem({ pageKey, pageName, detail,
           <div className="flex items-start gap-1.5 rounded-md bg-zinc-100 dark:bg-zinc-800 px-3 py-2">
             <AlertCircle className="mt-0.5 h-3 w-3 shrink-0 text-zinc-400" />
             <p className="text-[10px] leading-relaxed text-zinc-500 dark:text-zinc-400">
-              Estes detalhes serão incluídos no prompt para guiar o Design na criação desta página específica.
+              {strings.pageDetailHelper}
             </p>
           </div>
         </div>
@@ -114,6 +117,7 @@ interface PageDetailEditorListProps {
   pageDetails: Record<string, PageDetail>;
   onPageDetailChange: (key: string, detail: PageDetail) => void;
   pageLabels: Record<string, string>;
+  lang: import('../core/i18n').Lang;
 }
 
 export const PageDetailEditorList = memo(function PageDetailEditorList({
@@ -122,7 +126,9 @@ export const PageDetailEditorList = memo(function PageDetailEditorList({
   pageDetails,
   onPageDetailChange,
   pageLabels,
+  lang,
 }: PageDetailEditorListProps) {
+  const strings = t(lang);
   const customPageList = customPages
     .split(',')
     .map(p => p.trim())
@@ -143,12 +149,12 @@ export const PageDetailEditorList = memo(function PageDetailEditorList({
       <div className="flex items-center gap-2 mb-3">
         <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
         <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
-          Detalhar Páginas Individualmente
+          {strings.pageDetailTitle}
         </span>
         <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
       </div>
       <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-3">
-        Clica em cada página para adicionar descrição, componentes e notas específicas que guiarão o design de cada ecrã.
+        {strings.pageDetailDesc}
       </p>
       {allPages.map(page => (
         <PageDetailItem
@@ -158,6 +164,7 @@ export const PageDetailEditorList = memo(function PageDetailEditorList({
           detail={getDetail(page.key)}
           onChange={onPageDetailChange}
           isCustom={page.isCustom}
+          lang={lang}
         />
       ))}
     </div>

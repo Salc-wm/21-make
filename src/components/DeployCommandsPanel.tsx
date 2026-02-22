@@ -1,9 +1,11 @@
 import { useState, useMemo, memo } from 'react';
+import { t } from '../core/PromptBuilder';
 import { Terminal, ClipboardCopy, Check, ChevronDown, ChevronUp } from 'lucide-react';
 import type { DeployPromptConfig } from '../deployTypes';
 
 interface DeployCommandsPanelProps {
   config: DeployPromptConfig;
+  lang: import('../core/i18n').Lang;
 }
 
 interface CommandBlock {
@@ -246,7 +248,8 @@ function buildCommands(config: DeployPromptConfig): CommandBlock[] {
   }));
 }
 
-export const DeployCommandsPanel = memo(function DeployCommandsPanel({ config }: DeployCommandsPanelProps) {
+export const DeployCommandsPanel = memo(function DeployCommandsPanel({ config, lang }: DeployCommandsPanelProps) {
+  const strings = t(lang);
   const blocks = useMemo(() => buildCommands(config), [config]);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [isExpanded, setIsExpanded] = useState(true);
@@ -281,10 +284,10 @@ export const DeployCommandsPanel = memo(function DeployCommandsPanel({ config }:
         <div className="flex items-center gap-2">
           <Terminal className="h-4 w-4 text-teal-500" />
           <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-            Comandos de Deploy
+            {strings.deployCmdsTitle}
           </span>
           <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
-            — prontos para executar
+            {strings.deployCmdsReady}
           </span>
         </div>
         {isExpanded ? (
@@ -307,7 +310,7 @@ export const DeployCommandsPanel = memo(function DeployCommandsPanel({ config }:
               }`}
             >
               {copiedAll ? <Check className="h-3 w-3" /> : <ClipboardCopy className="h-3 w-3" />}
-              {copiedAll ? 'Copiado!' : 'Copiar tudo'}
+              {copiedAll ? strings.copied : strings.copyAll}
             </button>
           </div>
 
@@ -327,7 +330,7 @@ export const DeployCommandsPanel = memo(function DeployCommandsPanel({ config }:
                   }`}
                 >
                   {copiedIdx === idx ? <Check className="h-2.5 w-2.5" /> : <ClipboardCopy className="h-2.5 w-2.5" />}
-                  {copiedIdx === idx ? 'Copiado' : 'Copiar'}
+                  {copiedIdx === idx ? strings.copied : strings.copy}
                 </button>
               </div>
               <pre className="px-3 py-2 overflow-x-auto text-[11px] leading-relaxed font-mono text-teal-700 dark:text-teal-300 bg-zinc-950/[0.02] dark:bg-zinc-950/40 selection:bg-teal-200/30">

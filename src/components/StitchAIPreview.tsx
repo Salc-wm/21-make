@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { t } from '../core/PromptBuilder';
 import { Sparkles, X, Key, Loader2, AlertCircle, Send, Trash2, Settings2 } from 'lucide-react';
 
 type AIProvider = 'openai' | 'gemini';
@@ -12,6 +13,7 @@ interface AIConfig {
 interface StitchAIPreviewProps {
   prompt: string;
   nightMode: boolean;
+  lang: import('../core/i18n').Lang;
 }
 
 const PROVIDER_MODELS: Record<AIProvider, { label: string; models: { value: string; label: string }[] }> = {
@@ -96,7 +98,8 @@ async function callAI(config: AIConfig, prompt: string, signal: AbortSignal): Pr
   throw new Error('Unknown provider');
 }
 
-export function StitchAIPreview({ prompt, nightMode: _nightMode }: StitchAIPreviewProps) {
+export function StitchAIPreview({ prompt, nightMode: _nightMode, lang }: StitchAIPreviewProps) {
+  const strings = t(lang);
   const [isOpen, setIsOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [aiConfig, setAIConfig] = useState<AIConfig>(() => {
@@ -119,7 +122,7 @@ export function StitchAIPreview({ prompt, nightMode: _nightMode }: StitchAIPrevi
   const handleGenerate = async () => {
     if (!aiConfig.apiKey.trim()) {
       setShowSettings(true);
-      setError('Configura a tua API key primeiro.');
+      setError(strings.apiKeyError);
       return;
     }
 
@@ -156,7 +159,7 @@ export function StitchAIPreview({ prompt, nightMode: _nightMode }: StitchAIPrevi
         className="flex items-center gap-2 rounded-xl border border-dashed border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900 px-4 py-3 text-sm font-medium text-zinc-700 dark:text-zinc-300 transition hover:border-zinc-400 hover:bg-zinc-50 dark:hover:border-zinc-500 dark:hover:bg-zinc-800 w-full justify-center"
       >
         <Sparkles className="h-4 w-4 text-amber-500" />
-        Testar com IA — Ver resultado Design
+        {strings.aiPreviewBtn}
       </button>
     );
   }
@@ -167,7 +170,7 @@ export function StitchAIPreview({ prompt, nightMode: _nightMode }: StitchAIPrevi
       <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 px-5 py-3">
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-amber-500" />
-          <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Design AI Preview</span>
+          <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">{strings.aiPreviewTitle}</span>
         </div>
         <div className="flex items-center gap-1.5">
           <button
@@ -177,7 +180,7 @@ export function StitchAIPreview({ prompt, nightMode: _nightMode }: StitchAIPrevi
                 ? 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100'
                 : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'
             }`}
-            title="Configurações"
+            title={strings.settings}
           >
             <Settings2 className="h-3.5 w-3.5" />
           </button>
@@ -195,7 +198,7 @@ export function StitchAIPreview({ prompt, nightMode: _nightMode }: StitchAIPrevi
         <div className="border-b border-zinc-100 dark:border-zinc-800 px-5 py-4 space-y-3 bg-zinc-50 dark:bg-zinc-800/50">
           {/* Provider */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-zinc-700 dark:text-zinc-300">Provedor de IA</label>
+            <label className="mb-1 block text-xs font-medium text-zinc-700 dark:text-zinc-300">{strings.provider}</label>
             <div className="grid grid-cols-2 gap-2">
               {(Object.keys(PROVIDER_MODELS) as AIProvider[]).map(p => (
                 <button
@@ -216,7 +219,7 @@ export function StitchAIPreview({ prompt, nightMode: _nightMode }: StitchAIPrevi
 
           {/* Model */}
           <div>
-            <label className="mb-1 block text-xs font-medium text-zinc-700 dark:text-zinc-300">Modelo</label>
+            <label className="mb-1 block text-xs font-medium text-zinc-700 dark:text-zinc-300">{strings.model}</label>
             <select
               value={aiConfig.model}
               onChange={e => saveConfig({ ...aiConfig, model: e.target.value })}
@@ -242,7 +245,7 @@ export function StitchAIPreview({ prompt, nightMode: _nightMode }: StitchAIPrevi
               className="w-full rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500 font-mono"
             />
             <p className="mt-1 text-[10px] text-zinc-400">
-              A key é guardada apenas localmente no teu browser.
+              {strings.apiKeyInfo}
             </p>
           </div>
         </div>
@@ -262,12 +265,12 @@ export function StitchAIPreview({ prompt, nightMode: _nightMode }: StitchAIPrevi
           {loading ? (
             <>
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              A gerar...
+              {strings.generating}
             </>
           ) : (
             <>
               <Send className="h-3.5 w-3.5" />
-              Gerar com {PROVIDER_MODELS[aiConfig.provider].label}
+              {strings.generateWith} {PROVIDER_MODELS[aiConfig.provider].label}
             </>
           )}
         </button>
@@ -275,7 +278,7 @@ export function StitchAIPreview({ prompt, nightMode: _nightMode }: StitchAIPrevi
           <button
             onClick={handleClear}
             className="flex items-center justify-center rounded-lg border border-zinc-200 dark:border-zinc-700 p-2 text-zinc-500 dark:text-zinc-400 transition hover:bg-zinc-50 dark:hover:bg-zinc-800"
-            title="Limpar"
+            title={strings.clear}
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>

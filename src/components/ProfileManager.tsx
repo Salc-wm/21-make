@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { t } from '../core/PromptBuilder';
 import { Save, Download, Trash2, Bookmark } from 'lucide-react';
 import { CustomSelect } from './CustomSelect';
 
@@ -6,9 +7,11 @@ interface ProfileManagerProps<T> {
   mode: 'design' | 'dev' | 'deploy';
   currentConfig: T;
   onLoadProfile: (config: T) => void;
+  lang: import('../core/i18n').Lang;
 }
 
-export function ProfileManager<T>({ mode, currentConfig, onLoadProfile }: ProfileManagerProps<T>) {
+export function ProfileManager<T>({ mode, currentConfig, onLoadProfile, lang }: ProfileManagerProps<T>) {
+  const strings = t(lang);
   const storageKey = `stitch-profiles-${mode}`;
 
   const [profiles, setProfiles] = useState<Record<string, T>>(() => {
@@ -71,7 +74,7 @@ export function ProfileManager<T>({ mode, currentConfig, onLoadProfile }: Profil
     <div className="flex flex-col sm:flex-row sm:items-center gap-3 rounded-lg border border-indigo-200 dark:border-indigo-900/50 bg-indigo-50/50 dark:bg-indigo-900/10 p-3">
       <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
         <Bookmark className="h-4 w-4" />
-        <span className="text-xs font-semibold uppercase tracking-wider">Perfis Salvos</span>
+        <span className="text-xs font-semibold uppercase tracking-wider">{strings.savedProfiles}</span>
       </div>
 
       <div className="flex-1 flex items-center gap-2">
@@ -79,7 +82,7 @@ export function ProfileManager<T>({ mode, currentConfig, onLoadProfile }: Profil
           value={selectedProfile}
           onChange={(val) => setSelectedProfile(val)}
           options={Object.keys(profiles).map(name => ({ value: name, label: name }))}
-          placeholder="-- Selecionar Perfil --"
+          placeholder={strings.selectProfile}
           className="flex-1"
           buttonClassName="px-2.5 py-1.5 text-xs text-zinc-900 dark:text-zinc-100"
           placement="top"
@@ -89,7 +92,7 @@ export function ProfileManager<T>({ mode, currentConfig, onLoadProfile }: Profil
           <button
             onClick={handleLoad}
             className="flex items-center justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-700 disabled:opacity-50"
-            title="Carregar Perfil"
+            title={strings.loadProfile}
           >
             <Download className="h-3.5 w-3.5" />
           </button>
@@ -102,15 +105,15 @@ export function ProfileManager<T>({ mode, currentConfig, onLoadProfile }: Profil
             <button
               onClick={handleUpdateCurrent}
               className="flex items-center gap-1.5 rounded-md border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400 transition hover:bg-zinc-50 dark:hover:bg-zinc-700"
-              title="Atualizar perfil selecionado"
+              title={strings.updateProfile}
             >
               <Save className="h-3.5 w-3.5" />
-              Atualizar
+              {strings.updateProfile}
             </button>
             <button
               onClick={handleDelete}
               className="flex items-center justify-center rounded-md border border-red-200 dark:border-red-900/30 bg-red-50 dark:bg-red-900/20 px-2 py-1.5 text-red-600 dark:text-red-400 transition hover:bg-red-100 dark:hover:bg-red-900/40"
-              title="Eliminar Perfil"
+              title={strings.deleteProfile}
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>
@@ -121,7 +124,7 @@ export function ProfileManager<T>({ mode, currentConfig, onLoadProfile }: Profil
           onClick={handleSaveAs}
           className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition ${!selectedProfile ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30'}`}
         >
-          {hasProfiles ? 'Novo' : 'Salvar Perfil'}
+          {hasProfiles ? strings.newProfile : strings.saveProfile}
         </button>
       </div>
     </div>

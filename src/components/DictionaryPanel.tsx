@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import { t } from '../core/PromptBuilder';
 import { X, Copy, Check, Save, FileJson, FileText, FileCode, Braces } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { PromptConfig } from '../types';
@@ -20,6 +21,7 @@ interface DictionaryPanelProps {
   deployConfig: DeployPromptConfig;
   automationConfig: import('../automationTypes').AutomationPromptConfig;
   isTauri: boolean;
+  lang: import('../core/i18n').Lang;
 }
 
 const FORMAT_TABS: { id: DictFormat; label: string; icon: React.ReactNode; ext: string }[] = [
@@ -29,7 +31,8 @@ const FORMAT_TABS: { id: DictFormat; label: string; icon: React.ReactNode; ext: 
   { id: 'poml', label: 'POML', icon: <Braces className="h-3.5 w-3.5" />, ext: '.poml' },
 ];
 
-export function DictionaryPanel({ open, onClose, config, devConfig, deployConfig, automationConfig, isTauri }: DictionaryPanelProps) {
+export function DictionaryPanel({ open, onClose, config, devConfig, deployConfig, automationConfig, isTauri, lang }: DictionaryPanelProps) {
+  const strings = t(lang);
   const [format, setFormat] = useState<DictFormat>('json');
   const [copied, setCopied] = useState(false);
 
@@ -113,8 +116,8 @@ export function DictionaryPanel({ open, onClose, config, devConfig, deployConfig
                   <FileJson className="h-4 w-4 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-semibold text-zinc-100">Architecture Dictionary</h2>
-                  <p className="text-xs text-zinc-500">Projeto: {dictionary.meta.name || '—'}</p>
+                  <h2 className="text-sm font-semibold text-zinc-100">{strings.dictTitle}</h2>
+                  <p className="text-xs text-zinc-500">{strings.project}: {dictionary.meta.name || '—'}</p>
                 </div>
               </div>
 
@@ -131,7 +134,7 @@ export function DictionaryPanel({ open, onClose, config, devConfig, deployConfig
                     className="flex items-center gap-1.5 rounded-lg border border-zinc-700 px-2.5 py-1.5 text-xs text-zinc-300 transition hover:bg-zinc-800"
                   >
                     <Save className="h-3.5 w-3.5" />
-                    Salvar
+                    {strings.save}
                   </button>
                 )}
 
@@ -145,7 +148,7 @@ export function DictionaryPanel({ open, onClose, config, devConfig, deployConfig
                   }`}
                 >
                   {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                  {copied ? 'Copiado!' : 'Copiar'}
+                  {copied ? strings.copied : strings.copy}
                 </button>
 
                 {/* Close */}
