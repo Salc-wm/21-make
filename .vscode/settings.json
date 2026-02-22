@@ -1,0 +1,13 @@
+{
+  "gemini.mcp.servers": {
+    "coolify": {
+      "command": "npx",
+      "args": ["-y", "@masonator/coolify-mcp"],
+      "env": {
+        "COOLIFY_ACCESS_TOKEN": "your-api-token",
+        "COOLIFY_BASE_URL": "https://your-coolify-instance.com"
+      },
+      "disabled": true
+    }
+  }
+}

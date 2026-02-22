@@ -1,0 +1,147 @@
+import type { DeployPromptConfig } from '../deployTypes';
+import { defaultDeployConfig } from '../deployTypes';
+
+export interface DeployPrePrompt {
+  id: string;
+  label: string;
+  description: string;
+  emoji: string;
+  config: Partial<DeployPromptConfig>;
+}
+
+export const deployPrePrompts: DeployPrePrompt[] = [
+  {
+    id: 'docker-nginx-linux',
+    label: 'Docker + Nginx (Linux)',
+    description: 'SPA estática servida por Nginx num container Docker em Linux',
+    emoji: '🐳',
+    config: {
+      targetOS: 'linux',
+      environmentType: 'container',
+      containerPlatform: 'docker',
+      baseImage: 'nginx-alpine',
+      nodeVersion: '20',
+      serveWith: 'nginx',
+      reverseProxy: 'none',
+      sslMethod: 'letsencrypt',
+      healthcheck: 'http',
+      logging: 'stdout',
+    },
+  },
+  {
+    id: 'docker-compose-fullstack',
+    label: 'Docker Compose Full-Stack',
+    description: 'App + DB + Proxy com Docker Compose, volumes persistentes',
+    emoji: '🏗️',
+    config: {
+      projectType: 'ssr',
+      targetOS: 'linux',
+      environmentType: 'container',
+      containerPlatform: 'docker-compose',
+      baseImage: 'node-alpine',
+      nodeVersion: '20',
+      serveWith: 'node',
+      reverseProxy: 'traefik',
+      sslMethod: 'letsencrypt',
+      healthcheck: 'http',
+      logging: 'json',
+      backupStrategy: 'volume-backup',
+      extraNotes: 'Usar docker-compose.yml com serviços: app, postgres, traefik. Definir restart: unless-stopped em todos os serviços. Usar named volumes para dados persistentes.',
+    },
+  },
+  {
+    id: 'bare-metal-linux',
+    label: 'Directo em Linux (sem container)',
+    description: 'Deploy direto numa máquina Linux com Nginx + PM2',
+    emoji: '🐧',
+    config: {
+      targetOS: 'linux',
+      environmentType: 'bare-metal',
+      nodeVersion: '20',
+      serveWith: 'pm2',
+      reverseProxy: 'nginx',
+      sslMethod: 'letsencrypt',
+      healthcheck: 'http',
+      logging: 'file',
+    },
+  },
+  {
+    id: 'windows-iis',
+    label: 'Windows Server (directo)',
+    description: 'Deploy direto em Windows com Node.js ou IIS',
+    emoji: '🪟',
+    config: {
+      targetOS: 'windows',
+      environmentType: 'bare-metal',
+      nodeVersion: '20',
+      serveWith: 'pm2',
+      reverseProxy: 'none',
+      sslMethod: 'custom-cert',
+      healthcheck: 'tcp',
+      logging: 'file',
+    },
+  },
+  {
+    id: 'wsl2-docker',
+    label: 'WSL2 + Docker (Windows)',
+    description: 'Docker via WSL2 no Windows — melhor dos dois mundos',
+    emoji: '💻',
+    config: {
+      targetOS: 'linux',
+      environmentType: 'vm',
+      vmProvider: 'wsl2',
+      containerPlatform: 'docker',
+      baseImage: 'node-alpine',
+      nodeVersion: '20',
+      serveWith: 'nginx',
+      reverseProxy: 'none',
+      sslMethod: 'none',
+      healthcheck: 'http',
+      logging: 'stdout',
+      extraNotes: 'Usar WSL2 com Ubuntu. Docker Desktop com WSL2 backend. Mapear portas do WSL para o host Windows.',
+    },
+  },
+  {
+    id: 'vm-proxmox',
+    label: 'VM Proxmox + Docker',
+    description: 'VM Linux em Proxmox com Docker containers',
+    emoji: '🖥️',
+    config: {
+      targetOS: 'linux',
+      environmentType: 'vm',
+      vmProvider: 'proxmox',
+      containerPlatform: 'docker',
+      baseImage: 'node-alpine',
+      nodeVersion: '20',
+      serveWith: 'nginx',
+      reverseProxy: 'caddy',
+      sslMethod: 'letsencrypt',
+      healthcheck: 'http',
+      logging: 'json',
+      backupStrategy: 'snapshot',
+    },
+  },
+  {
+    id: 'caddy-auto-ssl',
+    label: 'Caddy Auto-SSL',
+    description: 'Container Docker com Caddy — HTTPS automático, zero config SSL',
+    emoji: '🔒',
+    config: {
+      targetOS: 'linux',
+      environmentType: 'container',
+      containerPlatform: 'docker',
+      baseImage: 'node-alpine',
+      nodeVersion: '20',
+      serveWith: 'caddy',
+      reverseProxy: 'caddy',
+      sslMethod: 'letsencrypt',
+      healthcheck: 'http',
+      logging: 'stdout',
+      extraNotes: 'Caddy configura SSL automaticamente via ACME. Apenas necessário apontar o DNS do domínio para o servidor.',
+    },
+  },
+];
+
+export function applyDeployPrePrompt(prePrompt: DeployPrePrompt): DeployPromptConfig {
+  return { ...defaultDeployConfig, ...prePrompt.config };
+}

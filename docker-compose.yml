@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  lp-stitchdesign-1:
+    build: .
+    container_name: lp-stitchdesign-1
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lp-stitchdesign-1.rule=Host(`stitch.example.com`)" # Mude esse valor para o host real
+      - "traefik.http.routers.lp-stitchdesign-1.entrypoints=websecure"
+      - "traefik.http.routers.lp-stitchdesign-1.tls=true"
+      - "traefik.http.routers.lp-stitchdesign-1.middlewares=lp-stitchdesign-1-https"
+      - "traefik.http.middlewares.lp-stitchdesign-1-https.redirectscheme.scheme=https"
+      - "traefik.http.services.lp-stitchdesign-1.loadbalancer.server.port=80"
+      - "prometheus.scrape=true"
+      - "prometheus.port=80"
+
+networks:
+  proxy:
+    external: true
