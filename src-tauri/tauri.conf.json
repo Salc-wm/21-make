@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "21 Prompt Generator",
+  "productName": "21 MAKE",
   "version": "0.1.0",
   "identifier": "com.promptgenerator.app",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "21 Prompt Generator",
+        "title": "21 MAKE",
         "width": 800,
         "height": 600,
         "decorations": false,

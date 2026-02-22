@@ -1,14 +1,14 @@
-# Stitch - Assistente de Criação de Prompts
+# 21 MAKE - Assistente de Criação de Prompts
 
-O **Stitch** é uma ferramenta gráfica avançada desenvolvida para arquitetar e gerar prompts estruturados, otimizados para Inteligências Artificiais. A aplicação atua como um assistente dinâmico multi-etapa, facilitando o design de interfaces, a configuração do ambiente de desenvolvimento, a orquestração do deploy e a criação de automações avançadas.
+O **21 MAKE** é uma ferramenta gráfica avançada desenvolvida para arquitetar e gerar prompts estruturados, otimizados para Inteligências Artificiais. A aplicação atua como um assistente dinâmico multi-etapa, facilitando o design de interfaces, a configuração do ambiente de desenvolvimento, a orquestração do deploy e a criação de automações avançadas.
 
-Desenvolvido para operar tanto como uma aplicação web moderna (SPA) quanto como um aplicativo desktop nativo através do [Tauri](https://tauri.app/), o Stitch é construído com tecnologias de ponta, entregando excelente performance e usabilidade.
+Desenvolvido para operar tanto como uma aplicação web moderna (SPA) quanto como um aplicativo desktop nativo através do [Tauri](https://tauri.app/), o 21 MAKE é construído com tecnologias de ponta, entregando excelente performance e usabilidade.
 
 ---
 
 ## 🚀 Principais Funcionalidades
 
-O Stitch divide o fluxo de trabalho arquitetural em **quatro pilares principais**, disponíveis em diferentes abas na interface:
+O 21 MAKE divide o fluxo de trabalho arquitetural em **quatro pilares principais**, disponíveis em diferentes abas na interface:
 
 1. **🎨 Design Mode:**
    - Construção de prompts voltados para design UI/UX.
@@ -96,7 +96,7 @@ docker-compose up -d --build
 
 ### Empacotando como Aplicação Desktop (Tauri)
 
-O Stitch está perfeitamente habilitado para rodar nativamente como aplicativo desktop.
+O 21 MAKE está perfeitamente habilitado para rodar nativamente como aplicativo desktop.
 
 - Para **abrir a janela Tauri localmente em modo Dev**:
 
@@ -114,7 +114,3 @@ O Stitch está perfeitamente habilitado para rodar nativamente como aplicativo d
 ## 📝 Regras e Contribuição
 
 Esse software abraça componentes de alta performance. As alocações em array e manipulações de DOM evitam duplicação extensa através de um núcleo em _React Providers/Hooks_ modulares. Importações de dependências usam a diretriz estrita (via _Tree Shaking_) para não inflacionar o bundle final. Mantenha os mesmos padrões nas aberturas de PR.
-
----
-
-`#Feito com IA e muita automação!`
