@@ -1,5 +1,7 @@
 # 21 MAKE - Assistente de Criação de Prompts
 
+_[English Version](README.en.md) | [Versão em Português](README.md)_
+
 O **21 MAKE** é uma ferramenta gráfica avançada desenvolvida para arquitetar e gerar prompts estruturados, otimizados para Inteligências Artificiais. A aplicação atua como um assistente dinâmico multi-etapa, facilitando o design de interfaces, a configuração do ambiente de desenvolvimento, a orquestração do deploy e a criação de automações avançadas.
 
 Desenvolvido para operar tanto como uma aplicação web moderna (SPA) quanto como um aplicativo desktop nativo através do [Tauri](https://tauri.app/), o 21 MAKE é construído com tecnologias de ponta, entregando excelente performance e usabilidade.
