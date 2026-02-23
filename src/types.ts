@@ -95,5 +95,5 @@ export const defaultConfig: PromptConfig = {
 
   extraNotes: '',
 
-  promptLanguage: 'pt',
+  promptLanguage: 'en',
 };

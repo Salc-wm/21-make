@@ -6,11 +6,11 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import type { DeployPromptConfig } from '../deployTypes';
 import {
-  projectTypes, targetOSOptions, environmentTypes, vmProviders,
-  containerPlatforms, baseImages, nodeVersions, serveMethods,
-  reverseProxies, sslMethods, ciCdOptions, registryOptions,
-  healthcheckOptions, loggingOptions, backupStrategies,
-  deployAutomationPlatforms, queueSystems, workflowScaling,
+  getProjectTypes, getTargetOSOptions, getEnvironmentTypes, getVmProviders,
+  getContainerPlatforms, getBaseImages, getNodeVersions, getServeMethods,
+  getReverseProxies, getSslMethods, getCiCdOptions, getRegistryOptions,
+  getHealthcheckOptions, getLoggingOptions, getBackupStrategies,
+  getDeployAutomationPlatforms, getQueueSystems, getWorkflowScaling,
 } from '../data/options/deployOptions';
 import { SectionCard } from './SectionCard';
 import { SelectField } from './SelectField';
@@ -28,7 +28,7 @@ interface DeployFormProps {
 type DeploySectionId = 'project' | 'env' | 'container' | 'build' | 'network' | 'storage' | 'cicd' | 'monitor' | 'automation' | 'extras';
 
 export const DeployForm = memo(function DeployForm({ config, onUpdate, promptLength, isInheriting }: DeployFormProps) {
-  const lang = config.promptLanguage === 'en' ? 'en' : 'pt';
+  const lang = (config.promptLanguage as import('../core/i18n').Lang) || 'en';
   const strings = t(lang);
   const isContainer = config.environmentType === 'container';
 
@@ -74,19 +74,25 @@ export const DeployForm = memo(function DeployForm({ config, onUpdate, promptLen
       {/* Project */}
       <DeployCollapsible id="project" title={strings.project} icon={<Server className="h-4 w-4" />} defaultOpen>
         <SectionCard icon={<Server className="h-4 w-4" />} title={strings.project} description={strings.deployProjectDesc}>
-          <TextField label={strings.name} value={config.projectName} onChange={v => onUpdate('projectName', v)} placeholder="Ex: meu-saas-app" />
-          <TextField label={strings.description} value={config.projectDescription} onChange={v => onUpdate('projectDescription', v)} placeholder="Ex: Dashboard SaaS com Next.js + Prisma" multiline rows={2} />
-          <OptionCards label={strings.type} value={config.projectType} onChange={v => onUpdate('projectType', v)} options={projectTypes} />
+          <TextField label={strings.name} value={config.projectName} onChange={v => onUpdate('projectName', v)} placeholder={strings.projectNameHint} />
+          <TextField label={strings.description} value={config.projectDescription} onChange={v => onUpdate('projectDescription', v)} placeholder={strings.projectDescHint} multiline rows={2} />
+          <OptionCards label={strings.type} value={config.projectType} onChange={v => onUpdate('projectType', v)} options={getProjectTypes(lang)} />
         </SectionCard>
       </DeployCollapsible>
 
       {/* Environment */}
       <DeployCollapsible id="env" title={strings.environmentOS} icon={<Cpu className="h-4 w-4" />} defaultOpen>
         <SectionCard icon={<Cpu className="h-4 w-4" />} title={strings.environmentOS} description={strings.envDesc}>
-          <OptionCards label={lang === 'en' ? 'Operating System' : 'Sistema Operativo'} value={config.targetOS} onChange={v => onUpdate('targetOS', v)} options={targetOSOptions} />
-          <OptionCards label={lang === 'en' ? 'Environment Type' : 'Tipo de Ambiente'} value={config.environmentType} onChange={v => onUpdate('environmentType', v)} options={environmentTypes} />
+          <OptionCards label={strings.osLabel} value={config.targetOS} onChange={v => onUpdate('targetOS', v)} options={getTargetOSOptions(lang)} />
+          <OptionCards label={strings.envTypeLabel} value={config.environmentType} onChange={v => onUpdate('environmentType', v)} options={getEnvironmentTypes(lang)} />
           {config.environmentType === 'vm' && (
-            <SelectField label="Provedor VM" value={config.vmProvider} onChange={v => onUpdate('vmProvider', v)} options={vmProviders} />
+            <SelectField
+              label={strings.vmProviderLabel}
+              value={config.vmProvider}
+              onChange={v => onUpdate('vmProvider', v)}
+              options={getVmProviders(lang)}
+              placeholder={strings.selectOption}
+            />
           )}
         </SectionCard>
       </DeployCollapsible>
@@ -95,10 +101,10 @@ export const DeployForm = memo(function DeployForm({ config, onUpdate, promptLen
       {isContainer && (
         <DeployCollapsible id="container" title={strings.container} icon={<Container className="h-4 w-4" />} defaultOpen>
           <SectionCard icon={<Container className="h-4 w-4" />} title={strings.container} description={strings.containerDesc}>
-            <OptionCards label="Plataforma" value={config.containerPlatform} onChange={v => onUpdate('containerPlatform', v)} options={containerPlatforms} />
-            <OptionCards label="Imagem Base" value={config.baseImage} onChange={v => onUpdate('baseImage', v)} options={baseImages} />
+            <OptionCards label={strings.platformLabel} value={config.containerPlatform} onChange={v => onUpdate('containerPlatform', v)} options={getContainerPlatforms(lang)} />
+            <OptionCards label={strings.baseImageLabel} value={config.baseImage} onChange={v => onUpdate('baseImage', v)} options={getBaseImages(lang)} />
             {config.baseImage === 'custom' && (
-              <TextField label="Imagem Custom" value={config.customBaseImage} onChange={v => onUpdate('customBaseImage', v)} placeholder="Ex: myregistry.io/my-base:latest" />
+              <TextField label={strings.customImageLabel} value={config.customBaseImage} onChange={v => onUpdate('customBaseImage', v)} placeholder={strings.customImageHint} />
             )}
           </SectionCard>
         </DeployCollapsible>
@@ -107,57 +113,57 @@ export const DeployForm = memo(function DeployForm({ config, onUpdate, promptLen
       {/* Build & Runtime */}
       <DeployCollapsible id="build" title={strings.buildRuntime} icon={<Cpu className="h-4 w-4" />} defaultOpen>
         <SectionCard icon={<Cpu className="h-4 w-4" />} title={strings.buildRuntime} description={strings.buildDesc}>
-          <OptionCards label="Node.js Version" value={config.nodeVersion} onChange={v => onUpdate('nodeVersion', v)} options={nodeVersions} />
-          <TextField label="Build Command" value={config.buildCommand} onChange={v => onUpdate('buildCommand', v)} placeholder="npm run build" />
-          <TextField label="Output Directory" value={config.outputDir} onChange={v => onUpdate('outputDir', v)} placeholder="dist" />
-          <OptionCards label="Servir Com" value={config.serveWith} onChange={v => onUpdate('serveWith', v)} options={serveMethods} />
-          <TextField label="Variáveis de Ambiente" value={config.envVars} onChange={v => onUpdate('envVars', v)} placeholder={"DATABASE_URL=postgresql://...\nNODE_ENV=production\nAPI_KEY=xxx"} multiline rows={3} />
+          <OptionCards label={strings.nodeVersionLabel} value={config.nodeVersion} onChange={v => onUpdate('nodeVersion', v)} options={getNodeVersions(lang)} />
+          <TextField label={strings.buildCommandLabel} value={config.buildCommand} onChange={v => onUpdate('buildCommand', v)} placeholder={strings.buildCommandHint} />
+          <TextField label={strings.outputDirLabel} value={config.outputDir} onChange={v => onUpdate('outputDir', v)} placeholder={strings.outputDirHint} />
+          <OptionCards label={strings.serveWithLabel} value={config.serveWith} onChange={v => onUpdate('serveWith', v)} options={getServeMethods(lang)} />
+          <TextField label={strings.envVarsLabel} value={config.envVars} onChange={v => onUpdate('envVars', v)} placeholder={strings.envVarsHint} multiline rows={3} />
         </SectionCard>
       </DeployCollapsible>
 
       {/* Networking */}
       <DeployCollapsible id="network" title={strings.networking} icon={<Globe className="h-4 w-4" />}>
         <SectionCard icon={<Globe className="h-4 w-4" />} title={strings.networking} description={strings.networkDesc}>
-          <TextField label="Porta Exposta" value={config.exposedPort} onChange={v => onUpdate('exposedPort', v)} placeholder="80" />
-          <OptionCards label="Reverse Proxy" value={config.reverseProxy} onChange={v => onUpdate('reverseProxy', v)} options={reverseProxies} />
-          <OptionCards label="SSL / TLS" value={config.sslMethod} onChange={v => onUpdate('sslMethod', v)} options={sslMethods} />
-          <TextField label="Domínio" value={config.domain} onChange={v => onUpdate('domain', v)} placeholder="Ex: app.meudominio.com" />
+          <TextField label={strings.exposedPortLabel} value={config.exposedPort} onChange={v => onUpdate('exposedPort', v)} placeholder={strings.exposedPortHint} />
+          <OptionCards label={strings.reverseProxyLabel} value={config.reverseProxy} onChange={v => onUpdate('reverseProxy', v)} options={getReverseProxies(lang)} />
+          <OptionCards label={strings.sslLabel} value={config.sslMethod} onChange={v => onUpdate('sslMethod', v)} options={getSslMethods(lang)} />
+          <TextField label={strings.domainLabel} value={config.domain} onChange={v => onUpdate('domain', v)} placeholder={strings.domainHint} />
         </SectionCard>
       </DeployCollapsible>
 
       {/* Storage */}
       <DeployCollapsible id="storage" title={strings.storage} icon={<HardDrive className="h-4 w-4" />}>
         <SectionCard icon={<HardDrive className="h-4 w-4" />} title={strings.storage} description={strings.storageDesc}>
-          <TextField label="Volumes / Mounts" value={config.volumes} onChange={v => onUpdate('volumes', v)} placeholder="Ex: ./data:/app/data, postgres-data:/var/lib/postgresql/data" multiline rows={2} />
-          <OptionCards label="Backup" value={config.backupStrategy} onChange={v => onUpdate('backupStrategy', v)} options={backupStrategies} />
+          <TextField label={strings.volumesLabel} value={config.volumes} onChange={v => onUpdate('volumes', v)} placeholder={strings.volumesHint} multiline rows={2} />
+          <OptionCards label={strings.backupLabel} value={config.backupStrategy} onChange={v => onUpdate('backupStrategy', v)} options={getBackupStrategies(lang)} />
         </SectionCard>
       </DeployCollapsible>
 
       {/* CI/CD */}
       <DeployCollapsible id="cicd" title={strings.cicdRegistry} icon={<RefreshCw className="h-4 w-4" />}>
         <SectionCard icon={<RefreshCw className="h-4 w-4" />} title={strings.cicdRegistry} description={strings.cicdDesc}>
-          <OptionCards label="CI/CD" value={config.ciCd} onChange={v => onUpdate('ciCd', v)} options={ciCdOptions} />
-          <OptionCards label="Container Registry" value={config.registry} onChange={v => onUpdate('registry', v)} options={registryOptions} />
+          <OptionCards label={strings.cicdLabel} value={config.ciCd} onChange={v => onUpdate('ciCd', v)} options={getCiCdOptions(lang)} />
+          <OptionCards label={strings.registryLabel} value={config.registry} onChange={v => onUpdate('registry', v)} options={getRegistryOptions(lang)} />
         </SectionCard>
       </DeployCollapsible>
 
       {/* Monitoring */}
       <DeployCollapsible id="monitor" title={strings.monitoring} icon={<Activity className="h-4 w-4" />}>
         <SectionCard icon={<Activity className="h-4 w-4" />} title={strings.monitoring} description={strings.monitorDesc}>
-          <OptionCards label="Healthcheck" value={config.healthcheck} onChange={v => onUpdate('healthcheck', v)} options={healthcheckOptions} />
-          <OptionCards label="Logging" value={config.logging} onChange={v => onUpdate('logging', v)} options={loggingOptions} />
+          <OptionCards label={strings.healthcheckLabel} value={config.healthcheck} onChange={v => onUpdate('healthcheck', v)} options={getHealthcheckOptions(lang)} />
+          <OptionCards label={strings.loggingLabel} value={config.logging} onChange={v => onUpdate('logging', v)} options={getLoggingOptions(lang)} />
         </SectionCard>
       </DeployCollapsible>
 
       {/* Automation & Orchestration */}
       <DeployCollapsible id="automation" title={strings.automationOrchestration} icon={<Bot className="h-4 w-4" />}>
         <SectionCard icon={<Bot className="h-4 w-4" />} title={strings.automationOrchestration} description={strings.orchestrationDesc}>
-          <OptionCards label="Plataforma" value={config.automationPlatform} onChange={v => onUpdate('automationPlatform', v)} options={deployAutomationPlatforms} />
+          <OptionCards label={strings.platformLabel} value={config.automationPlatform} onChange={v => onUpdate('automationPlatform', v)} options={getDeployAutomationPlatforms(lang)} />
           {config.automationPlatform !== 'none' && (
             <>
-              <OptionCards label="Queue System" value={config.queueSystem} onChange={v => onUpdate('queueSystem', v)} options={queueSystems} />
-              <OptionCards label="Escalonamento" value={config.workflowScaling} onChange={v => onUpdate('workflowScaling', v)} options={workflowScaling} />
-              <TextField label="Notas de Automação" value={config.automationNotes} onChange={v => onUpdate('automationNotes', v)} placeholder="Ex: n8n rodando como container Docker separado..." multiline rows={3} />
+              <OptionCards label={strings.queueSystemLabel} value={config.queueSystem} onChange={v => onUpdate('queueSystem', v)} options={getQueueSystems(lang)} />
+              <OptionCards label={strings.scalingLabel} value={config.workflowScaling} onChange={v => onUpdate('workflowScaling', v)} options={getWorkflowScaling(lang)} />
+              <TextField label={strings.automationNotesLabel} value={config.automationNotes} onChange={v => onUpdate('automationNotes', v)} placeholder={strings.automationNotesHint} multiline rows={3} />
             </>
           )}
         </SectionCard>
@@ -166,7 +172,7 @@ export const DeployForm = memo(function DeployForm({ config, onUpdate, promptLen
       {/* Extra Notes */}
       <DeployCollapsible id="extras" title={strings.notes} icon={<FileText className="h-4 w-4" />}>
         <SectionCard icon={<FileText className="h-4 w-4" />} title={strings.notes} description={strings.notesDesc}>
-          <TextField label="Notas Livres" value={config.extraNotes} onChange={v => onUpdate('extraNotes', v)} placeholder="Ex: Usar docker-compose para orquestrar com DB..." multiline rows={4} />
+          <TextField label={strings.extraNotesLabel} value={config.extraNotes} onChange={v => onUpdate('extraNotes', v)} placeholder={strings.extraNotesHint} multiline rows={4} />
         </SectionCard>
       </DeployCollapsible>
       </div>

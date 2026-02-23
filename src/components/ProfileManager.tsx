@@ -32,12 +32,12 @@ export function ProfileManager<T>({ mode, currentConfig, onLoadProfile, lang }: 
       localStorage.setItem(storageKey, JSON.stringify(newProfiles));
       setProfiles(newProfiles);
     } catch {
-      alert("Failed to save profiles to localStorage.");
+      alert(strings.profileSaveError);
     }
   };
 
   const handleSaveAs = () => {
-    const name = window.prompt("Enter a name for this new profile:");
+    const name = window.prompt(strings.profilePromptName);
     if (!name || !name.trim()) return;
     
     const newProfiles = { ...profiles, [name.trim()]: currentConfig };
@@ -47,7 +47,7 @@ export function ProfileManager<T>({ mode, currentConfig, onLoadProfile, lang }: 
 
   const handleUpdateCurrent = () => {
     if (!selectedProfile) return;
-    if (window.confirm(`Are you sure you want to overwrite the profile "${selectedProfile}" with your current settings?`)) {
+    if (window.confirm(strings.profileConfirmOverwrite(selectedProfile))) {
       const newProfiles = { ...profiles, [selectedProfile]: currentConfig };
       saveProfilesToStorage(newProfiles);
     }
@@ -60,7 +60,7 @@ export function ProfileManager<T>({ mode, currentConfig, onLoadProfile, lang }: 
 
   const handleDelete = () => {
     if (!selectedProfile) return;
-    if (window.confirm(`Are you sure you want to delete the profile "${selectedProfile}"?`)) {
+    if (window.confirm(strings.profileConfirmDelete(selectedProfile))) {
       const newProfiles = { ...profiles };
       delete newProfiles[selectedProfile];
       saveProfilesToStorage(newProfiles);

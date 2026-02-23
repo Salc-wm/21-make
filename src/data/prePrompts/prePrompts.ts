@@ -1,5 +1,6 @@
 import type { PromptConfig } from '../../types';
 import { defaultConfig } from '../../types';
+import { i18n, type Lang } from '../../core/i18n';
 
 export interface PrePrompt {
   id: string;
@@ -10,17 +11,20 @@ export interface PrePrompt {
   config: Partial<PromptConfig>;
 }
 
-export const prePromptCategories: { value: string; label: string; emoji: string }[] = [
-  { value: 'all', label: 'Todos', emoji: '🌐' },
-  { value: 'productivity', label: 'Produtividade', emoji: '⚡' },
-  { value: 'business', label: 'Negócios', emoji: '💼' },
-  { value: 'marketing', label: 'Marketing', emoji: '📣' },
-  { value: 'dev-tools', label: 'Dev Tools', emoji: '🛠️' },
-  { value: 'finance', label: 'Finanças', emoji: '💰' },
-  { value: 'health', label: 'Saúde', emoji: '🏥' },
-  { value: 'education', label: 'Educação', emoji: '📚' },
-  { value: 'social', label: 'Social', emoji: '👥' },
-];
+export const getPrePromptCategories = (lang: Lang) => {
+  const strings = i18n[lang];
+  return [
+    { value: 'all', label: strings.templateAll, emoji: '🌐' },
+    { value: 'productivity', label: strings.templateProductivity, emoji: '⚡' },
+    { value: 'business', label: strings.templateBusiness, emoji: '💼' },
+    { value: 'marketing', label: strings.templateMarketing, emoji: '📣' },
+    { value: 'dev-tools', label: strings.templateDevTools, emoji: '🛠️' },
+    { value: 'finance', label: strings.templateFinance, emoji: '💰' },
+    { value: 'health', label: strings.templateHealth, emoji: '🏥' },
+    { value: 'education', label: strings.templateEducation, emoji: '📚' },
+    { value: 'social', label: strings.templateSocial, emoji: '👥' },
+  ];
+};
 
 import prePromptsData from '../json/prePrompts.json';
 

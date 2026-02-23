@@ -91,5 +91,5 @@ export const defaultDeployConfig: DeployPromptConfig = {
   automationNotes: '',
 
   extraNotes: '',
-  promptLanguage: 'pt',
+  promptLanguage: 'en',
 };

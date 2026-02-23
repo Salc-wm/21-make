@@ -2,11 +2,7 @@ import type { DeployPromptConfig } from '../deployTypes';
 import type { DevPromptConfig } from '../devTypes';
 import { generateDevPrompt } from './generateDevPrompt';
 import {
-  projectTypes, targetOSOptions, environmentTypes, vmProviders,
-  containerPlatforms, baseImages, nodeVersions, serveMethods,
-  reverseProxies, sslMethods, ciCdOptions, registryOptions,
-  healthcheckOptions, loggingOptions, backupStrategies,
-  deployAutomationPlatforms, queueSystems, workflowScaling,
+  getProjectTypes, getTargetOSOptions, getEnvironmentTypes, getVmProviders, getContainerPlatforms, getBaseImages, getNodeVersions, getServeMethods, getReverseProxies, getSslMethods, getCiCdOptions, getRegistryOptions, getHealthcheckOptions, getLoggingOptions, getBackupStrategies, getDeployAutomationPlatforms, getQueueSystems, getWorkflowScaling
 } from '../data/options/deployOptions';
 import { PromptBuilder, t, getLabel } from '../core/PromptBuilder';
 
@@ -21,7 +17,7 @@ export function generateDeployPrompt(config: DeployPromptConfig, inheritedDev?: 
   builder.addSection(`# 📋 ${strings.project}`, [
     builder.addField(strings.name, config.projectName),
     builder.addField(strings.description, config.projectDescription),
-    builder.addField(strings.type, config.projectType, projectTypes)
+    builder.addField(strings.type, config.projectType, getProjectTypes(lang))
   ]);
 
   // Inherited Dev
@@ -35,36 +31,36 @@ export function generateDeployPrompt(config: DeployPromptConfig, inheritedDev?: 
   }
 
   // Environment
-  const osInfo = targetOSOptions.find(o => o.value === config.targetOS);
+  const osInfo = getTargetOSOptions(lang).find(o => o.value === config.targetOS);
   builder.addSection(`## 🖥️ ${strings.environmentOS}`, [
-    builder.addField(lang === 'pt' ? 'Sistema Operativo' : 'Operating System', config.targetOS, targetOSOptions) + (osInfo?.desc ? ` — ${osInfo.desc}` : ''),
-    builder.addField(lang === 'pt' ? 'Tipo de Ambiente' : 'Environment Type', config.environmentType, environmentTypes),
-    config.environmentType === 'vm' && config.vmProvider !== 'none' ? builder.addField(lang === 'pt' ? 'Provedor VM' : 'VM Provider', config.vmProvider, vmProviders) : ''
+    builder.addField(lang === 'pt' ? 'Sistema Operativo' : 'Operating System', config.targetOS, getTargetOSOptions(lang)) + (osInfo?.desc ? ` — ${osInfo.desc}` : ''),
+    builder.addField(lang === 'pt' ? 'Tipo de Ambiente' : 'Environment Type', config.environmentType, getEnvironmentTypes(lang)),
+    config.environmentType === 'vm' && config.vmProvider !== 'none' ? builder.addField(lang === 'pt' ? 'Provedor VM' : 'VM Provider', config.vmProvider, getVmProviders(lang)) : ''
   ]);
 
   // Container
   if (isContainer) {
-    const imgLabel = config.baseImage === 'custom' && config.customBaseImage ? config.customBaseImage : getLabel(baseImages, config.baseImage);
+    const imgLabel = config.baseImage === 'custom' && config.customBaseImage ? config.customBaseImage : getLabel(getBaseImages(lang), config.baseImage);
     builder.addSection(`## 🐳 ${strings.container}`, [
-      builder.addField(lang === 'pt' ? 'Plataforma' : 'Platform', config.containerPlatform, containerPlatforms),
+      builder.addField(lang === 'pt' ? 'Plataforma' : 'Platform', config.containerPlatform, getContainerPlatforms(lang)),
       builder.addField(lang === 'pt' ? 'Imagem Base' : 'Base Image', imgLabel)
     ]);
   }
 
   // Build & Runtime
   builder.addSection(`## ⚙️ ${strings.buildRuntime}`, [
-    builder.addField('Node.js', config.nodeVersion, nodeVersions),
+    builder.addField('Node.js', config.nodeVersion, getNodeVersions(lang)),
     config.buildCommand ? builder.addField('Build Command', `\`${config.buildCommand}\``) : '',
     config.outputDir ? builder.addField('Output Directory', `\`${config.outputDir}\``) : '',
-    builder.addField(lang === 'pt' ? 'Servir Com' : 'Serve With', config.serveWith, serveMethods),
+    builder.addField(lang === 'pt' ? 'Servir Com' : 'Serve With', config.serveWith, getServeMethods(lang)),
     config.envVars.trim() ? `\n**${lang === 'pt' ? 'Variáveis de Ambiente' : 'Environment Variables'}:**\n\`\`\`\n${config.envVars}\n\`\`\`` : ''
   ]);
 
   // Networking
   builder.addSection(`## 🌐 ${strings.networking}`, [
     builder.addField(lang === 'pt' ? 'Porta Exposta' : 'Exposed Port', config.exposedPort),
-    config.reverseProxy !== 'none' ? builder.addField('Reverse Proxy', config.reverseProxy, reverseProxies) : '',
-    builder.addField('SSL / TLS', config.sslMethod, sslMethods),
+    config.reverseProxy !== 'none' ? builder.addField('Reverse Proxy', config.reverseProxy, getReverseProxies(lang)) : '',
+    builder.addField('SSL / TLS', config.sslMethod, getSslMethods(lang)),
     config.domain.trim() ? builder.addField(lang === 'pt' ? 'Domínio' : 'Domain', config.domain) : ''
   ]);
 
@@ -72,33 +68,33 @@ export function generateDeployPrompt(config: DeployPromptConfig, inheritedDev?: 
   if (config.volumes.trim() || config.backupStrategy !== 'none') {
     builder.addSection(`## 💾 ${strings.storage}`, [
       config.volumes.trim() ? builder.addField(lang === 'pt' ? 'Volumes / Mounts' : 'Volumes / Mounts', config.volumes) : '',
-      config.backupStrategy !== 'none' ? builder.addField(lang === 'pt' ? 'Estratégia de Backup' : 'Backup Strategy', config.backupStrategy, backupStrategies) : ''
+      config.backupStrategy !== 'none' ? builder.addField(lang === 'pt' ? 'Estratégia de Backup' : 'Backup Strategy', config.backupStrategy, getBackupStrategies(lang)) : ''
     ]);
   }
 
   // CI/CD
   if (config.ciCd !== 'none' || config.registry !== 'none') {
     builder.addSection(`## 🔄 ${strings.cicdRegistry}`, [
-      config.ciCd !== 'none' ? builder.addField('CI/CD', config.ciCd, ciCdOptions) : '',
-      config.registry !== 'none' ? builder.addField('Container Registry', config.registry, registryOptions) : ''
+      config.ciCd !== 'none' ? builder.addField('CI/CD', config.ciCd, getCiCdOptions(lang)) : '',
+      config.registry !== 'none' ? builder.addField('Container Registry', config.registry, getRegistryOptions(lang)) : ''
     ]);
   }
 
   // Monitoring
   builder.addSection(`## 📊 ${strings.monitoring}`, [
-    builder.addField('Healthcheck', config.healthcheck, healthcheckOptions),
-    builder.addField('Logging', config.logging, loggingOptions)
+    builder.addField('Healthcheck', config.healthcheck, getHealthcheckOptions(lang)),
+    builder.addField('Logging', config.logging, getLoggingOptions(lang))
   ]);
 
   // Automation
   if (config.automationPlatform !== 'none') {
-    const platInfo = deployAutomationPlatforms.find(p => p.value === config.automationPlatform);
-    const qInfo = queueSystems.find(q => q.value === config.queueSystem);
-    const scaleInfo = workflowScaling.find(w => w.value === config.workflowScaling);
+    const platInfo = getDeployAutomationPlatforms(lang).find(p => p.value === config.automationPlatform);
+    const qInfo = getQueueSystems(lang).find(q => q.value === config.queueSystem);
+    const scaleInfo = getWorkflowScaling(lang).find(w => w.value === config.getWorkflowScaling(lang));
     builder.addSection(`## 🤖 ${strings.automationOrchestration}`, [
-      builder.addField(lang === 'pt' ? 'Plataforma' : 'Platform', config.automationPlatform, deployAutomationPlatforms) + (platInfo?.desc ? ` — ${platInfo.desc}` : ''),
-      config.queueSystem !== 'none' ? builder.addField(lang === 'pt' ? 'Sistema de Filas' : 'Queue System', config.queueSystem, queueSystems) + (qInfo?.desc ? ` — ${qInfo.desc}` : '') : '',
-      builder.addField(lang === 'pt' ? 'Escalonamento' : 'Scaling', config.workflowScaling, workflowScaling) + (scaleInfo?.desc ? ` — ${scaleInfo.desc}` : ''),
+      builder.addField(lang === 'pt' ? 'Plataforma' : 'Platform', config.automationPlatform, getDeployAutomationPlatforms(lang)) + (platInfo?.desc ? ` — ${platInfo.desc}` : ''),
+      config.queueSystem !== 'none' ? builder.addField(lang === 'pt' ? 'Sistema de Filas' : 'Queue System', config.queueSystem, getQueueSystems(lang)) + (qInfo?.desc ? ` — ${qInfo.desc}` : '') : '',
+      builder.addField(lang === 'pt' ? 'Escalonamento' : 'Scaling', config.getWorkflowScaling(lang), getWorkflowScaling(lang)) + (scaleInfo?.desc ? ` — ${scaleInfo.desc}` : ''),
       config.automationNotes.trim() ? `\n### ${lang === 'pt' ? 'Notas de Automação' : 'Automation Notes'}\n${config.automationNotes}` : '',
       `\n> ${lang === 'pt' ? 'Incluir configuração e deploy do servidor de automação no mesmo fluxo. Garantir conexão segura entre app e automação (credenciais, network, volumes).' : 'Include automation server configuration and deployment in the same flow. Ensure secure connection between app and automation (credentials, network, volumes).'}`
     ]);

@@ -2,8 +2,8 @@ import { useMemo } from 'react';
 import { Layers, Workflow, Route, CheckCircle, ShieldCheck, Zap, Box } from 'lucide-react';
 import type { AutomationPromptConfig } from '../automationTypes';
 import {
-  automationPlatforms, automationTypes, triggerTypes,
-  coreNodes, authRequirements, errorHandlingOptions, retryOptions
+  getAutomationPlatforms, getAutomationTypes, getTriggerTypes,
+  getCoreNodes, getAuthRequirements, getErrorHandlingOptions, getRetryOptions
 } from '../data/options/automationOptions';
 import { SectionCard } from './SectionCard';
 import { TextField } from './TextField';
@@ -68,7 +68,8 @@ interface AutomationFormProps {
 }
 
 export function AutomationForm({ config, onUpdate, promptLength }: AutomationFormProps) {
-  const strings = t(config.promptLanguage === 'en' ? 'en' : 'pt');
+  const lang = (config.promptLanguage as import('../core/i18n').Lang) || 'en';
+  const strings = t(lang);
 
   const completionCount = useMemo(() => {
     let count = 0;
@@ -110,27 +111,27 @@ export function AutomationForm({ config, onUpdate, promptLength }: AutomationFor
           <SectionCard
             icon={<Layers className="h-4 w-4" />}
             title={strings.project}
-            description="Informações base do projeto de automação"
+            description={strings.automationProjectDesc}
           >
             <TextField
               label={strings.name}
               value={config.projectName}
               onChange={v => onUpdate('projectName', v)}
-              placeholder="Ex: Sync de Leads Diário"
+              placeholder={strings.projectNameHint}
             />
             <TextField
               label={strings.description}
               value={config.projectDescription}
               onChange={v => onUpdate('projectDescription', v)}
-              placeholder="Ex: Puxa leads do Typeform, valida o e-mail, insere no Hubspot e envia alert no Slack."
+              placeholder={strings.projectDescHint}
               multiline
               rows={3}
             />
             <TextField
-              label="Instruções Customizadas"
+              label={strings.customInstructionsLabel}
               value={config.customInstructions}
               onChange={v => onUpdate('customInstructions', v)}
-              placeholder="Ex: Não esquecer de formatar a data para YYYY-MM-DD..."
+              placeholder={strings.customInstructionsHint}
               multiline
               rows={4}
             />
@@ -140,32 +141,32 @@ export function AutomationForm({ config, onUpdate, promptLength }: AutomationFor
         {/* Platform & Triggers */}
         <AutoCollapsible
           id="platform"
-          title="Plataforma & Trigger"
+          title={`${strings.automationPlatformLabel} & ${strings.triggerLabel}`}
           icon={<Workflow className="h-4 w-4" />}
           defaultOpen
         >
           <SectionCard
             icon={<Workflow className="h-4 w-4" />}
-            title="Arquitetura Core"
-            description="Onde e como a automação inicia"
+            title={strings.archCoreTitle}
+            description={strings.archCoreDesc}
           >
             <OptionCards
-              label="Plataforma de Automação"
+              label={strings.automationPlatformLabel}
               value={config.targetPlatform}
               onChange={v => onUpdate('targetPlatform', v)}
-              options={automationPlatforms}
+              options={getAutomationPlatforms(lang)}
             />
             <OptionCards
-              label="Tipo de Automação"
+              label={strings.automationTypeLabel}
               value={config.automationType}
               onChange={v => onUpdate('automationType', v)}
-              options={automationTypes}
+              options={getAutomationTypes(lang)}
             />
             <OptionCards
-              label="Gatilho (Trigger)"
+              label={strings.triggerLabel}
               value={config.triggerType}
               onChange={v => onUpdate('triggerType', v)}
-              options={triggerTypes}
+              options={getTriggerTypes(lang)}
             />
           </SectionCard>
         </AutoCollapsible>
@@ -173,24 +174,24 @@ export function AutomationForm({ config, onUpdate, promptLength }: AutomationFor
         {/* Nodes & Auth */}
         <AutoCollapsible
           id="nodes"
-          title="Segurança & Nós"
+          title={strings.netFeaturesTitle}
           icon={<Box className="h-4 w-4" />}
           defaultOpen
         >
           <SectionCard
             icon={<ShieldCheck className="h-4 w-4" />}
-            title="Funcionalidades de Rede"
-            description="Nós e níveis de permissões"
+            title={strings.netFeaturesTitle}
+            description={strings.netFeaturesDesc}
           >
             <CheckboxGroup
-              label="Nós Essenciais do Workflow"
-              options={coreNodes}
+              label={strings.essentialNodesLabel}
+              options={getCoreNodes(lang)}
               selected={config.coreNodes}
               onChange={v => onUpdate('coreNodes', v)}
             />
             <CheckboxGroup
-              label="Requisitos de Autenticação / APIs"
-              options={authRequirements}
+              label={strings.authReqsLabel}
+              options={getAuthRequirements(lang)}
               selected={config.authRequirements}
               onChange={v => onUpdate('authRequirements', v)}
             />
@@ -200,26 +201,26 @@ export function AutomationForm({ config, onUpdate, promptLength }: AutomationFor
         {/* Resilience */}
         <AutoCollapsible
           id="resilience"
-          title="Resiliência"
+          title={strings.resilienceTitle}
           icon={<CheckCircle className="h-4 w-4" />}
           defaultOpen
         >
           <SectionCard
             icon={<Route className="h-4 w-4" />}
-            title="Falhas e Retentativas"
-            description="Como lidar com quedas de APIs"
+            title={strings.failRetryTitle}
+            description={strings.errorHandlingLabel}
           >
             <OptionCards
-              label="Em caso de erro em um Nó"
+              label={strings.errorHandlingLabel}
               value={config.errorHandling}
               onChange={v => onUpdate('errorHandling', v)}
-              options={errorHandlingOptions}
+              options={getErrorHandlingOptions(lang)}
             />
             <OptionCards
-              label="Política de Retentativas"
+              label={strings.retryPolicyLabel}
               value={config.retries}
               onChange={v => onUpdate('retries', v)}
-              options={retryOptions}
+              options={getRetryOptions(lang)}
             />
           </SectionCard>
         </AutoCollapsible>

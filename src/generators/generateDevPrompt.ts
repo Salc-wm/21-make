@@ -2,11 +2,7 @@ import type { DevPromptConfig } from '../devTypes';
 import type { PromptConfig as DesignPromptConfig } from '../types';
 import { generatePrompt as generateDesignPrompt } from './generatePrompt';
 import {
-  frameworks, devLanguages, cssApproaches, stateManagementOptions,
-  designPatterns, componentPatterns, routingApproaches, fileOrganizations,
-  apiTypes, authApproaches, databases, packageManagers,
-  testingOptions, codeQualityOptions, aiEditors, deployTargets,
-  automationPlatforms, automationTriggers, automationGateways, automationConnectors,
+  getFrameworks, getDevLanguages, getCssApproaches, getStateManagementOptions, getDesignPatterns, getComponentPatterns, getRoutingApproaches, getFileOrganizations, getApiTypes, getAuthApproaches, getDatabases, getPackageManagers, getTestingOptions, getCodeQualityOptions, getAiEditors, getDeployTargets, getAutomationPlatforms, getAutomationTriggers, getAutomationGateways, getAutomationConnectors
 } from '../data/options/devOptions';
 import { PromptBuilder, t } from '../core/PromptBuilder';
 
@@ -33,30 +29,30 @@ export function generateDevPrompt(config: DevPromptConfig, inheritedDesign?: Des
   }
 
   // Tech Stack
-  const fwInfo = frameworks.find(f => f.value === config.framework);
+  const fwInfo = getFrameworks(lang).find(f => f.value === config.framework);
   builder.addSection(`## ⚡ ${strings.techStack}`, [
-    builder.addField('Framework', config.framework, frameworks) + (fwInfo?.desc ? ` — ${fwInfo.desc}` : ''),
-    builder.addField(lang === 'pt' ? 'Linguagem' : 'Language', config.language, devLanguages),
-    builder.addField('CSS / Styling', config.cssApproach, cssApproaches),
-    builder.addField('Package Manager', config.packageManager, packageManagers)
+    builder.addField('Framework', config.framework, getFrameworks(lang)) + (fwInfo?.desc ? ` — ${fwInfo.desc}` : ''),
+    builder.addField(lang === 'pt' ? 'Linguagem' : 'Language', config.language, getDevLanguages(lang)),
+    builder.addField('CSS / Styling', config.cssApproach, getCssApproaches(lang)),
+    builder.addField('Package Manager', config.packageManager, getPackageManagers(lang))
   ]);
 
   // Architecture
-  const dpInfo = designPatterns.find(p => p.value === config.designPattern);
+  const dpInfo = getDesignPatterns(lang).find(p => p.value === config.designPattern);
   builder.addSection(`## 🏗️ ${strings.architecture}`, [
-    builder.addField('State Management', config.stateManagement, stateManagementOptions),
-    config.designPattern !== 'none' ? builder.addField('Design Pattern', config.designPattern, designPatterns) + (dpInfo?.desc ? ` — ${dpInfo.desc}` : '') : '',
-    builder.addField(lang === 'pt' ? 'Padrão de Componentes' : 'Component Pattern', config.componentPattern, componentPatterns),
-    builder.addField('Routing', config.routingApproach, routingApproaches),
-    builder.addField(lang === 'pt' ? 'Organização de Ficheiros' : 'File Organization', config.fileOrganization, fileOrganizations)
+    builder.addField('State Management', config.stateManagement, getStateManagementOptions(lang)),
+    config.designPattern !== 'none' ? builder.addField('Design Pattern', config.designPattern, getDesignPatterns(lang)) + (dpInfo?.desc ? ` — ${dpInfo.desc}` : '') : '',
+    builder.addField(lang === 'pt' ? 'Padrão de Componentes' : 'Component Pattern', config.componentPattern, getComponentPatterns(lang)),
+    builder.addField('Routing', config.routingApproach, getRoutingApproaches(lang)),
+    builder.addField(lang === 'pt' ? 'Organização de Ficheiros' : 'File Organization', config.fileOrganization, getFileOrganizations(lang))
   ]);
 
   // API & Data
   if (config.apiType !== 'none' || config.authApproach !== 'none' || config.database !== 'none') {
     builder.addSection(`## 🔌 ${strings.apiData}`, [
-      builder.addField(lang === 'pt' ? 'Tipo de API' : 'API Type', config.apiType, apiTypes),
-      config.authApproach !== 'none' ? builder.addField(lang === 'pt' ? 'Autenticação' : 'Authentication', config.authApproach, authApproaches) : '',
-      config.database !== 'none' ? builder.addField(lang === 'pt' ? 'Base de Dados' : 'Database', config.database, databases) : ''
+      builder.addField(lang === 'pt' ? 'Tipo de API' : 'API Type', config.apiType, getApiTypes(lang)),
+      config.authApproach !== 'none' ? builder.addField(lang === 'pt' ? 'Autenticação' : 'Authentication', config.authApproach, getAuthApproaches(lang)) : '',
+      config.database !== 'none' ? builder.addField(lang === 'pt' ? 'Base de Dados' : 'Database', config.database, getDatabases(lang)) : ''
     ]);
   }
 
@@ -64,42 +60,42 @@ export function generateDevPrompt(config: DevPromptConfig, inheritedDesign?: Des
   if (config.testing.length > 0 || config.codeQuality.length > 0) {
     builder.addSection(`## 🧪 ${strings.qualityTesting}`, [
       config.testing.length > 0 ? `**Testing:**\n${builder.addList(config.testing.map(v => {
-        const found = testingOptions.find(o => o.value === v);
+        const found = getTestingOptions(lang).find(o => o.value === v);
         return found?.label ?? v;
       }))}` : '',
       config.codeQuality.length > 0 ? `\n**${lang === 'pt' ? 'Qualidade de Código' : 'Code Quality'}:**\n${builder.addList(config.codeQuality.map(v => {
-        const found = codeQualityOptions.find(o => o.value === v);
+        const found = getCodeQualityOptions(lang).find(o => o.value === v);
         return found?.label ?? v;
       }))}` : ''
     ]);
   }
 
   // AI Editor
-  const editorInfo = aiEditors.find(e => e.value === config.aiEditor);
+  const editorInfo = getAiEditors(lang).find(e => e.value === config.aiEditor);
   builder.addSection(`## 🤖 ${strings.aiInstructions}`, [
-    builder.addField(lang === 'pt' ? 'AI Editor Alvo' : 'Target AI Editor', config.aiEditor, aiEditors) + (editorInfo?.desc ? ` — ${editorInfo.desc}` : ''),
+    builder.addField(lang === 'pt' ? 'AI Editor Alvo' : 'Target AI Editor', config.aiEditor, getAiEditors(lang)) + (editorInfo?.desc ? ` — ${editorInfo.desc}` : ''),
     config.aiInstructions.trim() ? `\n### ${lang === 'pt' ? 'Instruções Específicas' : 'Specific Instructions'}\n${config.aiInstructions}` : ''
   ]);
 
   // Deploy Target
   if (config.deployTarget !== 'none') {
-    builder.addSection(`## 🚀 ${strings.deploy}`, builder.addField('Target', config.deployTarget, deployTargets));
+    builder.addSection(`## 🚀 ${strings.deploy}`, builder.addField('Target', config.deployTarget, getDeployTargets(lang)));
   }
 
   // Automation
   if (config.automationPlatform !== 'none') {
-    const platInfo = automationPlatforms.find(p => p.value === config.automationPlatform);
+    const platInfo = getAutomationPlatforms(lang).find(p => p.value === config.automationPlatform);
     builder.addSection(`## 🔄 ${strings.automationWorkflows}`, [
-      builder.addField(lang === 'pt' ? 'Plataforma' : 'Platform', config.automationPlatform, automationPlatforms) + (platInfo?.desc ? ` — ${platInfo.desc}` : ''),
-      config.automationTriggers.length > 0 ? builder.addField('Triggers', config.automationTriggers.map(v => {
-        const found = automationTriggers.find(o => o.value === v);
+      builder.addField(lang === 'pt' ? 'Plataforma' : 'Platform', config.automationPlatform, getAutomationPlatforms(lang)) + (platInfo?.desc ? ` — ${platInfo.desc}` : ''),
+      config.getAutomationTriggers(lang).length > 0 ? builder.addField('Triggers', config.getAutomationTriggers(lang).map(v => {
+        const found = getAutomationTriggers(lang).find(o => o.value === v);
         return found?.label ?? v;
       }).join(', ')) : '',
-      config.automationGateways.length > 0 ? `**${lang === 'pt' ? 'Gateways' : 'Gateways'}:**\n${builder.addList(config.automationGateways.map(v => {
-        const found = automationGateways.find(o => o.value === v);
+      config.getAutomationGateways(lang).length > 0 ? `**${lang === 'pt' ? 'Gateways' : 'Gateways'}:**\n${builder.addList(config.getAutomationGateways(lang).map(v => {
+        const found = getAutomationGateways(lang).find(o => o.value === v);
         return found?.label ?? v;
       }))}` : '',
-      builder.addField(lang === 'pt' ? 'Conector' : 'Connector', config.automationConnector, automationConnectors),
+      builder.addField(lang === 'pt' ? 'Conector' : 'Connector', config.automationConnector, getAutomationConnectors(lang)),
       config.automationWorkflow.trim() ? `\n### ${lang === 'pt' ? 'Descrição do Workflow' : 'Workflow Description'}\n${config.automationWorkflow}` : '',
       `\n> ${lang === 'pt' ? 'Implementar endpoints/webhooks necessários para integração com a plataforma de automação. Garantir payload JSON consistente e documentação dos endpoints.' : 'Implement necessary endpoints/webhooks for integration with the automation platform. Ensure consistent JSON payloads and endpoint documentation.'}`
     ]);

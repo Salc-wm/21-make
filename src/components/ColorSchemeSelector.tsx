@@ -1,17 +1,20 @@
-import { colorSchemes } from '../data/options/options';
+import { getColorSchemes } from '../data/options/options';
+import type { Lang } from '../core/i18n';
 
 interface ColorSchemeSelectorProps {
   value: string;
   onChange: (value: string) => void;
   primaryColor: string;
   onPrimaryColorChange: (color: string) => void;
+  lang: Lang;
 }
 
-export function ColorSchemeSelector({ value, onChange, primaryColor, onPrimaryColorChange }: ColorSchemeSelectorProps) {
+export function ColorSchemeSelector({ value, onChange, primaryColor, onPrimaryColorChange, lang }: ColorSchemeSelectorProps) {
+  const colorSchemes = getColorSchemes(lang);
   return (
     <div>
       <label className="mb-2 block text-xs font-medium text-zinc-700 dark:text-zinc-300">
-        Paleta de Cores
+        {lang === 'pt' ? 'Paleta de Cores' : 'Color Palette'}
       </label>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {colorSchemes.map(scheme => (
@@ -38,14 +41,14 @@ export function ColorSchemeSelector({ value, onChange, primaryColor, onPrimaryCo
               </div>
             )}
             {scheme.value === 'custom' && (
-              <div className="mt-2 text-[10px] text-zinc-500 dark:text-zinc-400">Definir cor</div>
+              <div className="mt-2 text-[10px] text-zinc-500 dark:text-zinc-400">{lang === 'pt' ? 'Definir cor' : 'Set color'}</div>
             )}
           </button>
         ))}
       </div>
       {value === 'custom' && (
         <div className="mt-3 flex items-center gap-3">
-          <label className="text-xs text-zinc-600 dark:text-zinc-400">Cor Primária:</label>
+          <label className="text-xs text-zinc-600 dark:text-zinc-400">{lang === 'pt' ? 'Cor Primária:' : 'Primary Color:'}</label>
           <input
             type="color"
             value={primaryColor}

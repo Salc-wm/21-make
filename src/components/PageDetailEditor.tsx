@@ -62,7 +62,7 @@ const PageDetailItem = memo(function PageDetailItem({ pageKey, pageName, detail,
             <textarea
               value={detail.description}
               onChange={e => onChange(pageKey, { ...detail, description: e.target.value })}
-              placeholder={`Ex: Ecrã principal com visão geral das métricas, gráficos de atividade e ações rápidas para ${pageName.toLowerCase()}.`}
+              placeholder={strings.pageDescPlaceholder(pageName)}
               rows={2}
               className="w-full resize-y rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
             />
@@ -78,7 +78,7 @@ const PageDetailItem = memo(function PageDetailItem({ pageKey, pageName, detail,
               type="text"
               value={detail.components}
               onChange={e => onChange(pageKey, { ...detail, components: e.target.value })}
-              placeholder="Ex: Tabela de dados, filtros laterais, botão de exportação, paginação"
+              placeholder={strings.pageElementsPlaceholder}
               className="w-full rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
             />
           </div>
@@ -93,7 +93,7 @@ const PageDetailItem = memo(function PageDetailItem({ pageKey, pageName, detail,
               type="text"
               value={detail.notes}
               onChange={e => onChange(pageKey, { ...detail, notes: e.target.value })}
-              placeholder="Ex: Deve ter estado vazio com CTA, loading skeleton, modal de confirmação ao eliminar"
+              placeholder={strings.pageNotesPlaceholder}
               className="w-full rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
             />
           </div>

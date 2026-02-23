@@ -124,7 +124,7 @@ export function DictionaryPanel({ open, onClose, config, devConfig, deployConfig
               <div className="flex items-center gap-2">
                 {/* Stats */}
                 <span className="text-xs text-zinc-500">
-                  {charCount.toLocaleString()} chars · ≈ {tokenEstimate.toLocaleString()} tokens
+                  {charCount.toLocaleString()} {strings.characters} · ≈ {tokenEstimate.toLocaleString()} {strings.tokens}
                 </span>
 
                 {/* Save As */}

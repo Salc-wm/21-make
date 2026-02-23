@@ -2,7 +2,7 @@ export interface AutomationPromptConfig {
   // Shared
   projectName: string;
   projectDescription: string;
-  promptLanguage: 'pt' | 'en';
+  promptLanguage: string;
   tone: string;
 
   // Automation Specific
@@ -19,7 +19,7 @@ export interface AutomationPromptConfig {
 export const defaultAutomationConfig: AutomationPromptConfig = {
   projectName: '',
   projectDescription: '',
-  promptLanguage: 'pt',
+  promptLanguage: 'en',
   tone: 'professional',
   targetPlatform: 'n8n',
   automationType: 'ETL / Data Sync',

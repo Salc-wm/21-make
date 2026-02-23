@@ -1,19 +1,23 @@
 import { useState } from 'react';
 import { Sparkles, ChevronRight, Search, X, Package } from 'lucide-react';
-import { prePrompts, prePromptCategories, applyPrePrompt } from '../data/prePrompts/prePrompts';
+import { prePrompts, getPrePromptCategories, applyPrePrompt } from '../data/prePrompts/prePrompts';
 import type { PrePrompt } from '../data/prePrompts/prePrompts';
 import type { PromptConfig } from '../types';
+import { t } from '../core/PromptBuilder';
+import { Lang } from '../core/i18n';
 
 interface PrePromptPanelProps {
   onApply: (config: PromptConfig) => void;
   nightMode: boolean;
+  lang: Lang;
 }
 
-export function PrePromptPanel({ onApply }: PrePromptPanelProps) {
+export function PrePromptPanel({ onApply, lang }: PrePromptPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [search, setSearch] = useState('');
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const strings = t(lang);
 
   const filtered = prePrompts.filter(p => {
     const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
@@ -45,7 +49,7 @@ export function PrePromptPanel({ onApply }: PrePromptPanelProps) {
         className="group flex items-center gap-2 rounded-xl border border-dashed border-amber-300 dark:border-amber-600/50 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 px-4 py-3 text-sm font-medium text-amber-800 dark:text-amber-300 transition-all hover:border-amber-400 hover:shadow-sm hover:shadow-amber-100 dark:hover:border-amber-500 dark:hover:shadow-amber-900/20 w-full justify-center"
       >
         <Package className="h-4 w-4 text-amber-500 transition-transform group-hover:scale-110" />
-        <span>Usar Pre&#8209;Prompt SaaS</span>
+        <span>{strings.usePrePrompt}</span>
         <ChevronRight className="h-3.5 w-3.5 ml-auto opacity-60 transition-transform group-hover:translate-x-0.5" />
       </button>
     );
@@ -57,8 +61,8 @@ export function PrePromptPanel({ onApply }: PrePromptPanelProps) {
       <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 px-4 py-3 bg-gradient-to-r from-amber-50/80 to-orange-50/80 dark:from-amber-900/10 dark:to-orange-900/10">
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-amber-500" />
-          <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">Pre-Prompts SaaS</span>
-          <span className="text-[10px] text-zinc-500 dark:text-zinc-400">— templates prontos</span>
+          <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">{strings.prePromptHeader}</span>
+          <span className="text-[10px] text-zinc-500 dark:text-zinc-400">{strings.prePromptSubHeader}</span>
         </div>
         <button
           onClick={() => { setIsOpen(false); setConfirmingId(null); setSearch(''); }}
@@ -76,7 +80,7 @@ export function PrePromptPanel({ onApply }: PrePromptPanelProps) {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Pesquisar templates..."
+            placeholder={strings.searchTemplates}
             className="w-full rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 pl-9 pr-3 py-2 text-xs text-zinc-900 dark:text-zinc-100 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 dark:focus:border-zinc-500"
           />
         </div>
@@ -84,7 +88,7 @@ export function PrePromptPanel({ onApply }: PrePromptPanelProps) {
 
       {/* Category filter */}
       <div className="px-4 pb-2 flex flex-wrap gap-1.5">
-        {prePromptCategories.map(cat => (
+        {getPrePromptCategories(lang).map(cat => (
           <button
             key={cat.value}
             onClick={() => setSelectedCategory(cat.value)}
@@ -104,7 +108,7 @@ export function PrePromptPanel({ onApply }: PrePromptPanelProps) {
         {filtered.length === 0 && (
           <div className="flex flex-col items-center py-8 text-zinc-400 dark:text-zinc-500">
             <Search className="h-6 w-6 mb-2 opacity-40" />
-            <span className="text-xs">Nenhum template encontrado</span>
+            <span className="text-xs">{strings.noTemplatesFound}</span>
           </div>
         )}
         {filtered.map(pp => {
@@ -128,7 +132,7 @@ export function PrePromptPanel({ onApply }: PrePromptPanelProps) {
                     </span>
                     {isConfirming && (
                       <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400">
-                        Clica para confirmar
+                        {strings.clickToConfirm}
                       </span>
                     )}
                   </div>

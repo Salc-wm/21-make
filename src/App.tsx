@@ -11,10 +11,10 @@ import type { PageDetail } from './types';
 import { type DevPromptConfig, defaultDevConfig } from './devTypes';
 import { type DeployPromptConfig, defaultDeployConfig } from './deployTypes';
 import {
-  appTypes, appPageTypeOptions, designStyles, darkModeOptions, borderRadiusOptions,
-  densityOptions, fontStyles, fontSizes, layoutTypes,
-  navigationStyles, animationOptions, componentOptions,
-  pageOptions, feedbackOptions, languageOptions, toneOptions,
+  getAppTypes, getAppPageTypeOptions, getDesignStyles, getDarkModeOptions, getBorderRadiusOptions,
+  getDensityOptions, getFontStyles, getFontSizes, getLayoutTypes,
+  getNavigationStyles, getAnimationOptions, getComponentOptions,
+  getPageOptions, getFeedbackOptions, getLanguageOptions, getToneOptions,
 } from './data/options/options';
 import { generatePrompt } from './generators/generatePrompt';
 import { generateLandingPagePrompt } from './generators/generateLandingPagePrompt';
@@ -75,12 +75,13 @@ export function App() {
     }
   };
 
-  const getSavedLanguage = (): 'pt' | 'en' => {
+  const getSavedLanguage = (): import('./core/i18n').Lang => {
     try {
-      const saved = localStorage.getItem('stitch-language');
-      return saved === 'en' ? 'en' : 'pt';
+      const saved = localStorage.getItem('stitch-language') as import('./core/i18n').Lang;
+      if (['pt', 'en', 'es', 'fr'].includes(saved)) return saved;
+      return 'en';
     } catch {
-      return 'pt';
+      return 'en';
     }
   };
 
@@ -126,7 +127,7 @@ export function App() {
   const generatedDeployPromptText = useMemo(() => generateDeployPrompt(deployConfig, hasDevContext ? devConfig : undefined), [deployConfig, devConfig, hasDevContext]);
   const generatedAutomationPromptText = useMemo(() => generateAutomationPrompt(automationConfig, hasDesignContext ? config : undefined), [automationConfig, config, hasDesignContext]);
   
-  const lang = config.promptLanguage === 'en' ? 'en' : 'pt';
+  const lang = (config.promptLanguage as import('./core/i18n').Lang) || 'en';
   const strings = t(lang);
 
   const generatedPrompt = 
@@ -167,9 +168,9 @@ export function App() {
   // Build page labels map for PageDetailEditorList
   const pageLabels = useMemo(() => {
     const map: Record<string, string> = {};
-    pageOptions.forEach(p => { map[p.value] = p.label; });
+    getPageOptions(lang).forEach(p => { map[p.value] = p.label; });
     return map;
-  }, []);
+  }, [lang]);
 
   const handleCopy = async () => {
     const promptToCopy = prompt.replace(/\n*---\n*\*Prompt.*$/i, '');
@@ -258,11 +259,7 @@ export function App() {
   const toggleSection = useCallback((id: SectionId) => {
     setExpandedSections(prev => {
       const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
+      next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
   }, []);
@@ -311,15 +308,14 @@ export function App() {
     try { localStorage.setItem('stitch-language', settings.promptLanguage); } catch { /* ignore */ }
   }, []);
 
-  const completionCount = useMemo(() => {
-    let count = 0;
-    if (config.projectName) count++;
-    if (config.projectDescription) count++;
-    if (config.components.length > 0) count++;
-    if (config.pages.length > 0) count++;
-    if (config.feedback.length > 0) count++;
-    return count;
-  }, [config]);
+  const completionCount = useMemo(() => [
+    !!config.projectName,
+    !!config.projectDescription,
+
+    config.components.length > 0,
+    config.pages.length > 0,
+    config.feedback.length > 0
+  ].filter(Boolean).length, [config]);
 
   // Global Keyboard Shortcuts
   useEffect(() => {
@@ -329,21 +325,20 @@ export function App() {
         e.preventDefault();
         handleCopy();
       }
-      
+
       // Ctrl/Cmd + 1, 2, 3, 4
+      const modeMap: Record<string, any> = {
+        '1': 'design',
+        '2': 'dev',
+        '3': 'deploy',
+        '4': 'automation'
+      };
+
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
-        if (e.key === '1') {
+        const mode = modeMap[e.key];
+        if (mode) {
           e.preventDefault();
-          setActiveMode('design');
-        } else if (e.key === '2') {
-          e.preventDefault();
-          setActiveMode('dev');
-        } else if (e.key === '3') {
-          e.preventDefault();
-          setActiveMode('deploy');
-        } else if (e.key === '4') {
-          e.preventDefault();
-          setActiveMode('automation');
+          setActiveMode(mode);
         }
       }
     };
@@ -367,7 +362,7 @@ export function App() {
             <div>
               <h1 className="text-sm font-bold tracking-tight text-zinc-900 dark:text-zinc-100">{strings.appTitle}</h1>
               <p className="text-[10px] text-zinc-500 dark:text-zinc-400">
-                {activeMode === 'design' ? strings.appSubDesign : activeMode === 'dev' ? strings.appSubDev : activeMode === 'automation' ? 'Gerador de Automações & Workflows' : strings.appSubDeploy}
+                {activeMode === 'design' ? strings.appSubDesign : activeMode === 'dev' ? strings.appSubDev : activeMode === 'automation' ? strings.appSubAutomation : strings.appSubDeploy}
               </p>
             </div>
           </div>
@@ -416,14 +411,18 @@ export function App() {
                 }`}
               >
                 <Workflow className="h-3 w-3" />
-                Automate
+                {strings.automation}
               </button>
             </div>
-            {/* Prompt Language Toggle */}
             <button
               onClick={() => {
                 const currentLang = activeMode === 'design' ? config.promptLanguage : activeMode === 'dev' ? devConfig.promptLanguage : activeMode === 'automation' ? automationConfig.promptLanguage : deployConfig.promptLanguage;
-                const newLang = currentLang === 'pt' ? 'en' : 'pt';
+                let newLang = 'en';
+                if (currentLang === 'en') newLang = 'pt';
+                else if (currentLang === 'pt') newLang = 'es';
+                else if (currentLang === 'es') newLang = 'fr';
+                else newLang = 'en';
+
                 update('promptLanguage', newLang);
                 updateDev('promptLanguage', newLang);
                 updateDeploy('promptLanguage', newLang);
@@ -433,11 +432,14 @@ export function App() {
               className="flex items-center gap-1 rounded-lg border border-zinc-200 dark:border-zinc-700 px-2 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400 transition hover:bg-zinc-50 dark:hover:bg-zinc-800"
               title={(() => {
                 const langCode = activeMode === 'design' ? config.promptLanguage : activeMode === 'dev' ? devConfig.promptLanguage : activeMode === 'automation' ? automationConfig.promptLanguage : deployConfig.promptLanguage;
-                return langCode === 'en' ? 'Switch to Portuguese' : 'Switch to English';
+                if (langCode === 'en') return strings.switchToPt;
+                if (langCode === 'pt') return strings.switchToEs;
+                if (langCode === 'es') return strings.switchToFr;
+                return strings.switchToEn;
               })()}
             >
               <Globe className="h-3 w-3" />
-              {(activeMode === 'design' ? config.promptLanguage : activeMode === 'dev' ? devConfig.promptLanguage : deployConfig.promptLanguage) === 'pt' ? 'PT' : 'EN'}
+              {(activeMode === 'design' ? config.promptLanguage : activeMode === 'dev' ? devConfig.promptLanguage : activeMode === 'automation' ? automationConfig.promptLanguage : deployConfig.promptLanguage).toUpperCase()}
             </button>
             {/* Night Mode Toggle */}
             <button
@@ -522,9 +524,9 @@ export function App() {
             {activeMode === 'design' ? (
               <>
                 {/* Pre-Prompt Panel */}
-                <PrePromptPanel onApply={(cfg) => setConfig(cfg)} nightMode={nightMode} />
+                <PrePromptPanel onApply={(cfg) => setConfig(cfg)} nightMode={nightMode} lang={lang} />
 
-                <ProfileManager mode="design" currentConfig={config} onLoadProfile={setConfig} />
+                <ProfileManager mode="design" currentConfig={config} onLoadProfile={setConfig} lang={lang} />
 
                 {/* Stats bar */}
                 <div className="flex items-center gap-4 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-2.5">
@@ -548,14 +550,14 @@ export function App() {
               {/* Project */}
               <CollapsibleSection id="project" title={strings.project} icon={<Layers className="h-4 w-4" />} isOpen={isSectionOpen('project')} onToggle={() => toggleSection('project')}>
                 <SectionCard icon={<Layers className="h-4 w-4" />} title={strings.project} description={strings.projectDesc}>
-                  <TextField label={strings.name} value={config.projectName} onChange={v => update('projectName', v)} placeholder="Ex: meu-projeto-saas" />
-                  <TextField label={strings.description} value={config.projectDescription} onChange={v => update('projectDescription', v)} placeholder="Ex: Uma plataforma para gestão de tarefas..." multiline rows={2} />
-                  <OptionCards label={strings.type} value={config.appType} onChange={v => update('appType', v)} options={appTypes} />
-                  <OptionCards label={lang === 'en' ? 'Screen Type' : 'Tipo de Ecrã'} value={config.appPageType} onChange={v => update('appPageType', v)} options={appPageTypeOptions} />
+                  <TextField label={strings.name} value={config.projectName} onChange={v => update('projectName', v)} placeholder={strings.projectNameHint} />
+                  <TextField label={strings.description} value={config.projectDescription} onChange={v => update('projectDescription', v)} placeholder={strings.projectDescHint} multiline rows={2} />
+                  <OptionCards label={strings.type} value={config.appType} onChange={v => update('appType', v)} options={getAppTypes(lang)} />
+                  <OptionCards label={strings.screenType} value={config.appPageType} onChange={v => update('appPageType', v)} options={getAppPageTypeOptions(lang)} />
                   {config.appPageType === 'multi-page' && (
                     <div className="flex items-center gap-4 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 p-3">
                       <div className="flex-1">
-                        <label className="text-xs font-medium text-zinc-500">{lang === 'en' ? 'Number of Pages' : 'Número de Páginas'}</label>
+                        <label className="text-xs font-medium text-zinc-500">{strings.numberOfPages}</label>
                         <input type="number" min="1" max="20" value={config.numberOfPages} onChange={e => update('numberOfPages', parseInt(e.target.value) || 1)} className="mt-1 block w-full rounded-md border border-zinc-200 bg-white py-1.5 px-3 text-sm focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900" />
                       </div>
                     </div>
@@ -566,42 +568,42 @@ export function App() {
               {/* Visual Style */}
               <CollapsibleSection id="visual" title={strings.visualStyle} icon={<Paintbrush className="h-4 w-4" />} isOpen={isSectionOpen('visual')} onToggle={() => toggleSection('visual')}>
                 <SectionCard icon={<Paintbrush className="h-4 w-4" />} title={strings.visualStyle} description={strings.styleDesc}>
-                  <OptionCards label={strings.designStyle} value={config.designStyle} onChange={v => update('designStyle', v)} options={designStyles} />
-                  <ColorSchemeSelector value={config.colorScheme} onChange={v => update('colorScheme', v)} primaryColor={config.primaryColor} onPrimaryColorChange={v => update('primaryColor', v)} />
-                  <OptionCards label={strings.mode} value={config.darkMode} onChange={v => update('darkMode', v)} options={darkModeOptions} />
-                  <OptionCards label={strings.borderRadius} value={config.borderRadius} onChange={v => update('borderRadius', v)} options={borderRadiusOptions} />
-                  <OptionCards label={strings.density} value={config.density} onChange={v => update('density', v)} options={densityOptions} />
+                  <OptionCards label={strings.designStyle} value={config.designStyle} onChange={v => update('designStyle', v)} options={getDesignStyles(lang)} />
+                  <ColorSchemeSelector value={config.colorScheme} onChange={v => update('colorScheme', v)} primaryColor={config.primaryColor} onPrimaryColorChange={v => update('primaryColor', v)} lang={lang} />
+                  <OptionCards label={strings.mode} value={config.darkMode} onChange={v => update('darkMode', v)} options={getDarkModeOptions(lang)} />
+                  <OptionCards label={strings.borderRadius} value={config.borderRadius} onChange={v => update('borderRadius', v)} options={getBorderRadiusOptions(lang)} />
+                  <OptionCards label={strings.density} value={config.density} onChange={v => update('density', v)} options={getDensityOptions(lang)} />
                 </SectionCard>
               </CollapsibleSection>
 
               {/* Typography */}
               <CollapsibleSection id="typo" title={strings.typography} icon={<Type className="h-4 w-4" />} isOpen={isSectionOpen('typo')} onToggle={() => toggleSection('typo')}>
                 <SectionCard icon={<Type className="h-4 w-4" />} title={strings.typography} description={strings.styleDesc}>
-                  <SelectField label="Font Style" value={config.fontStyle} onChange={v => update('fontStyle', v)} options={fontStyles} />
-                  <OptionCards label="Base Font Size" value={config.fontSize} onChange={v => update('fontSize', v)} options={fontSizes} />
+                  <SelectField label={strings.fontStyleLabel} value={config.fontStyle} onChange={v => update('fontStyle', v)} options={getFontStyles(lang)} />
+                  <OptionCards label={strings.fontSizeLabel} value={config.fontSize} onChange={v => update('fontSize', v)} options={getFontSizes(lang)} />
                 </SectionCard>
               </CollapsibleSection>
 
               {/* Layout & Navigation */}
               <CollapsibleSection id="layout" title={strings.layoutNav} icon={<Layout className="h-4 w-4" />} isOpen={isSectionOpen('layout')} onToggle={() => toggleSection('layout')}>
                 <SectionCard icon={<Layout className="h-4 w-4" />} title={strings.layoutNav} description={strings.pagesDesc}>
-                  <OptionCards label="Layout Type" value={config.layoutType} onChange={v => update('layoutType', v)} options={layoutTypes} />
-                  <OptionCards label="Navigation Style" value={config.navigationStyle} onChange={v => update('navigationStyle', v)} options={navigationStyles} />
+                  <OptionCards label={strings.layoutTypeLabel} value={config.layoutType} onChange={v => update('layoutType', v)} options={getLayoutTypes(lang)} />
+                  <OptionCards label={strings.navStyleLabel} value={config.navigationStyle} onChange={v => update('navigationStyle', v)} options={getNavigationStyles(lang)} />
                 </SectionCard>
               </CollapsibleSection>
 
               {/* Components */}
               <CollapsibleSection id="components" title={strings.components} icon={<Puzzle className="h-4 w-4" />} isOpen={isSectionOpen('components')} onToggle={() => toggleSection('components')}>
                 <SectionCard icon={<Puzzle className="h-4 w-4" />} title={strings.components} description={strings.pagesDesc}>
-                  <CheckboxGroup label="UI Components" options={componentOptions} selected={config.components} onChange={v => update('components', v)} columns={2} />
-                  <OptionCards label="Animations" value={config.animations} onChange={v => update('animations', v)} options={animationOptions} />
+                  <CheckboxGroup label="UI Components" options={getComponentOptions(lang)} selected={config.components} onChange={v => update('components', v)} columns={2} />
+                  <OptionCards label="Animations" value={config.animations} onChange={v => update('animations', v)} options={getAnimationOptions(lang)} />
                 </SectionCard>
               </CollapsibleSection>
 
               {/* Pages */}
               <CollapsibleSection id="pages" title={strings.pagesTitle} icon={<FileText className="h-4 w-4" />} isOpen={isSectionOpen('pages')} onToggle={() => toggleSection('pages')}>
                 <SectionCard icon={<FileText className="h-4 w-4" />} title={strings.pagesTitle} description={strings.pagesDesc}>
-                  <CheckboxGroup label="Core Pages" options={pageOptions} selected={config.pages} onChange={v => update('pages', v)} columns={2} />
+                  <CheckboxGroup label="Core Pages" options={getPageOptions(lang)} selected={config.pages} onChange={v => update('pages', v)} columns={2} />
                   <TextField label="Custom Pages (comma separated)" value={config.customPages} onChange={v => update('customPages', v)} placeholder="Ex: Dashboard, Settings, Profile" />
                   <PageDetailEditorList
                     pages={config.pages}
@@ -609,6 +611,7 @@ export function App() {
                     pageDetails={config.pageDetails}
                     onPageDetailChange={updatePageDetail}
                     pageLabels={pageLabels}
+                    lang={lang}
                   />
                 </SectionCard>
               </CollapsibleSection>
@@ -616,15 +619,15 @@ export function App() {
               {/* Interactions */}
               <CollapsibleSection id="interactions" title={strings.interactions} icon={<MessageSquare className="h-4 w-4" />} isOpen={isSectionOpen('interactions')} onToggle={() => toggleSection('interactions')}>
                 <SectionCard icon={<MessageSquare className="h-4 w-4" />} title={strings.interactions} description={strings.interactionsDesc}>
-                  <CheckboxGroup label="Feedback & States" options={feedbackOptions} selected={config.feedback} onChange={v => update('feedback', v)} columns={2} />
+                  <CheckboxGroup label="Feedback & States" options={getFeedbackOptions(lang)} selected={config.feedback} onChange={v => update('feedback', v)} columns={2} />
                 </SectionCard>
               </CollapsibleSection>
 
               {/* Tone & Quality */}
               <CollapsibleSection id="tone" title={strings.toneLang} icon={<RotateCcw className="h-4 w-4" />} isOpen={isSectionOpen('tone')} onToggle={() => toggleSection('tone')}>
                 <SectionCard icon={<RotateCcw className="h-4 w-4" />} title={strings.toneLang} description={strings.toneDesc}>
-                  <OptionCards label="Tone of Voice" value={config.tone} onChange={v => update('tone', v)} options={toneOptions} />
-                  <OptionCards label={strings.language} value={config.language} onChange={v => update('language', v)} options={languageOptions} />
+                  <OptionCards label="Tone of Voice" value={config.tone} onChange={v => update('tone', v)} options={getToneOptions(lang)} />
+                  <OptionCards label={strings.language} value={config.language} onChange={v => update('language', v)} options={getLanguageOptions(lang)} />
                 </SectionCard>
               </CollapsibleSection>
 
@@ -641,7 +644,7 @@ export function App() {
                 {/* Dev Pre-Prompt Panel */}
                 <DevPrePromptPanel onApply={(cfg) => setDevConfig(cfg)} />
 
-                <ProfileManager mode="dev" currentConfig={devConfig} onLoadProfile={setDevConfig} />
+                <ProfileManager mode="dev" currentConfig={devConfig} onLoadProfile={setDevConfig} lang={lang} />
                 {/* Dev Form */}
                 <DevForm
                   config={devConfig}
@@ -655,7 +658,7 @@ export function App() {
                 {/* Deploy Pre-Prompt Panel */}
                 <DeployPrePromptPanel onApply={(cfg) => setDeployConfig(cfg)} />
 
-                <ProfileManager mode="deploy" currentConfig={deployConfig} onLoadProfile={setDeployConfig} />
+                <ProfileManager mode="deploy" currentConfig={deployConfig} onLoadProfile={setDeployConfig} lang={lang} />
                 {/* Deploy Form */}
                 <DeployForm
                   config={deployConfig}
@@ -687,14 +690,14 @@ export function App() {
                   <div className="flex items-center gap-2">
                     <div className={`h-2 w-2 rounded-full ${isEditing ? 'bg-amber-500' : 'bg-emerald-500'}`} />
                     <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100">
-                      {isEditing ? 'A Editar Prompt' : 'Prompt Gerado'}
+                      {isEditing ? strings.editingPrompt : strings.generatedPrompt}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => setIsPromptMinimized(!isPromptMinimized)}
                       className="flex items-center justify-center rounded-lg border border-zinc-200 p-1.5 text-zinc-600 transition hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
-                      title={isPromptMinimized ? (lang === 'en' ? 'Expand' : 'Expandir') : (lang === 'en' ? 'Minimize' : 'Minimizar')}
+                      title={isPromptMinimized ? strings.expand : strings.minimize}
                     >
                       {isPromptMinimized ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronUp className="h-3.5 w-3.5" />}
                     </button>
@@ -713,10 +716,10 @@ export function App() {
                           ? 'bg-amber-50 text-amber-700 ring-1 ring-amber-300 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-600'
                           : 'border border-zinc-200 text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800'
                       }`}
-                      title={isEditing ? 'Sair do modo de edição' : 'Editar prompt diretamente'}
+                      title={isEditing ? strings.exitEditMode : strings.editPromptDirectly}
                     >
                       <Pencil className="h-3.5 w-3.5" />
-                      {isEditing ? 'A Editar' : 'Editar'}
+                      {isEditing ? strings.editing : strings.edit}
                     </button>
                     <button
                       onClick={handleCopy}
@@ -729,12 +732,12 @@ export function App() {
                       {copied ? (
                         <>
                           <Check className="h-3.5 w-3.5" />
-                          Copiado!
+                          {strings.copied}
                         </>
                       ) : (
                         <>
                           <ClipboardCopy className="h-3.5 w-3.5" />
-                          Copiar
+                          {strings.copy}
                         </>
                       )}
                     </button>
@@ -742,10 +745,10 @@ export function App() {
                       <button
                         onClick={handleSaveAs}
                         className="flex items-center gap-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-400 transition hover:bg-zinc-50 dark:hover:bg-zinc-800"
-                        title="Guardar como ficheiro"
+                        title={strings.saveAsFile}
                       >
                         <Save className="h-3.5 w-3.5" />
-                        Guardar
+                        {strings.save}
                       </button>
                     )}
                   </div>
@@ -773,13 +776,13 @@ export function App() {
               {/* Deploy Commands Panel — only in deploy mode */}
               {activeMode === 'deploy' && (
                 <div className="mt-4">
-                  <DeployCommandsPanel config={deployConfig} />
+                  <DeployCommandsPanel config={deployConfig} lang={lang} />
                 </div>
               )}
 
               {/* AI Preview */}
               <div className="mt-4">
-                <StitchAIPreview prompt={prompt} nightMode={nightMode} />
+                <StitchAIPreview prompt={prompt} nightMode={nightMode} lang={lang} />
               </div>
             </div>
           </div>
@@ -822,6 +825,7 @@ export function App() {
         deployConfig={deployConfig}
         automationConfig={automationConfig}
         isTauri={isTauri}
+        lang={lang}
       />
 
       {/* Global Settings Modal */}

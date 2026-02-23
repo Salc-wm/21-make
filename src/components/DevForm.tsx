@@ -6,11 +6,11 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import type { DevPromptConfig } from '../devTypes';
 import {
-  frameworks, devLanguages, cssApproaches, stateManagementOptions,
-  designPatterns, componentPatterns, routingApproaches, fileOrganizations,
-  apiTypes, authApproaches, databases, packageManagers,
-  testingOptions, codeQualityOptions, aiEditors, deployTargets,
-  automationPlatforms, automationTriggers, automationGateways, automationConnectors,
+  getFrameworks, getDevLanguages, getCssApproaches, getStateManagementOptions,
+  getDesignPatterns, getComponentPatterns, getRoutingApproaches, getFileOrganizations,
+  getApiTypes, getAuthApproaches, getDatabases, getPackageManagers,
+  getTestingOptions, getCodeQualityOptions, getAiEditors, getDeployTargets,
+  getAutomationPlatforms, getAutomationTriggers, getAutomationGateways, getAutomationConnectors,
 } from '../data/options/devOptions';
 import { SectionCard } from './SectionCard';
 import { SelectField } from './SelectField';
@@ -29,7 +29,8 @@ interface DevFormProps {
 type DevSectionId = 'project' | 'tech' | 'arch' | 'api' | 'quality' | 'ai' | 'deploy' | 'automation' | 'extras';
 
 export function DevForm({ config, onUpdate, promptLength, isInheriting }: DevFormProps) {
-  const strings = t(config.promptLanguage === 'en' ? 'en' : 'pt');
+  const lang = (config.promptLanguage as import('../core/i18n').Lang) || 'en';
+  const strings = t(lang);
   
   const completionCount = useMemo(() => {
     let count = 0;
@@ -79,28 +80,28 @@ export function DevForm({ config, onUpdate, promptLength, isInheriting }: DevFor
       >
         <SectionCard
           icon={<Layers className="h-4 w-4" />}
-          title={`${strings.project} & Referência de Design`}
-          description="Contexto do projeto e designs existentes"
+          title={`${strings.project} & ${strings.designRefLabel}`}
+          description={strings.designRefDesc}
         >
           <TextField
             label={strings.name}
             value={config.projectName}
             onChange={v => onUpdate('projectName', v)}
-            placeholder="Ex: TaskFlow Dashboard"
+            placeholder={strings.projectNameHint}
           />
           <TextField
             label={strings.description}
             value={config.projectDescription}
             onChange={v => onUpdate('projectDescription', v)}
-            placeholder="Ex: Dashboard SaaS de gestão de projetos com Kanban, timeline e analytics"
+            placeholder={strings.projectDescHint}
             multiline
             rows={2}
           />
           <TextField
-            label="Referência de Design"
+            label={strings.designRefLabel}
             value={config.designReference}
             onChange={v => onUpdate('designReference', v)}
-            placeholder="Ex: Seguir as imagens de design geradas anteriormente..."
+            placeholder={strings.designRefHint}
             multiline
             rows={4}
           />
@@ -120,28 +121,28 @@ export function DevForm({ config, onUpdate, promptLength, isInheriting }: DevFor
           description={strings.devProjectDesc}
         >
           <OptionCards
-            label="Framework"
+            label={strings.frameworkLabel}
             value={config.framework}
             onChange={v => onUpdate('framework', v)}
-            options={frameworks}
+            options={getFrameworks(lang)}
           />
           <OptionCards
-            label={strings.language || 'Linguagem'}
+            label={strings.language}
             value={config.language}
             onChange={v => onUpdate('language', v)}
-            options={devLanguages}
+            options={getDevLanguages(lang)}
           />
           <OptionCards
-            label="CSS / Styling"
+            label={strings.cssLabel}
             value={config.cssApproach}
             onChange={v => onUpdate('cssApproach', v)}
-            options={cssApproaches}
+            options={getCssApproaches(lang)}
           />
           <OptionCards
-            label="Package Manager"
+            label={strings.packageManagerLabel}
             value={config.packageManager}
             onChange={v => onUpdate('packageManager', v)}
-            options={packageManagers}
+            options={getPackageManagers(lang)}
           />
         </SectionCard>
       </DevCollapsible>
@@ -159,34 +160,35 @@ export function DevForm({ config, onUpdate, promptLength, isInheriting }: DevFor
           description={strings.patternsDesc}
         >
           <OptionCards
-            label="State Management"
+            label={strings.stateMgmtLabel}
             value={config.stateManagement}
             onChange={v => onUpdate('stateManagement', v)}
-            options={stateManagementOptions}
+            options={getStateManagementOptions(lang)}
           />
           <OptionCards
-            label="Design Pattern"
+            label={strings.designPatternLabel}
             value={config.designPattern}
             onChange={v => onUpdate('designPattern', v)}
-            options={designPatterns}
+            options={getDesignPatterns(lang)}
           />
           <OptionCards
-            label="Padrão de Componentes"
+            label={strings.componentPatternLabel}
             value={config.componentPattern}
             onChange={v => onUpdate('componentPattern', v)}
-            options={componentPatterns}
+            options={getComponentPatterns(lang)}
           />
           <SelectField
-            label="Routing"
+            label={strings.routingLabel}
             value={config.routingApproach}
             onChange={v => onUpdate('routingApproach', v)}
-            options={routingApproaches}
+            options={getRoutingApproaches(lang)}
+            placeholder={strings.selectOption}
           />
           <OptionCards
-            label="Organização de Ficheiros"
+            label={strings.fileOrgLabel}
             value={config.fileOrganization}
             onChange={v => onUpdate('fileOrganization', v)}
-            options={fileOrganizations}
+            options={getFileOrganizations(lang)}
           />
         </SectionCard>
       </DevCollapsible>
@@ -203,22 +205,25 @@ export function DevForm({ config, onUpdate, promptLength, isInheriting }: DevFor
           description={strings.apiDesc}
         >
           <SelectField
-            label="Tipo de API"
+            label={strings.apiTypeLabel}
             value={config.apiType}
             onChange={v => onUpdate('apiType', v)}
-            options={apiTypes}
+            options={getApiTypes(lang)}
+            placeholder={strings.selectOption}
           />
           <SelectField
-            label="Autenticação"
+            label={strings.authLabel}
             value={config.authApproach}
             onChange={v => onUpdate('authApproach', v)}
-            options={authApproaches}
+            options={getAuthApproaches(lang)}
+            placeholder={strings.selectOption}
           />
           <SelectField
-            label="Base de Dados"
+            label={strings.dbLabel}
             value={config.database}
             onChange={v => onUpdate('database', v)}
-            options={databases}
+            options={getDatabases(lang)}
+            placeholder={strings.selectOption}
           />
         </SectionCard>
       </DevCollapsible>
@@ -235,15 +240,15 @@ export function DevForm({ config, onUpdate, promptLength, isInheriting }: DevFor
           description={strings.qualityDesc}
         >
           <CheckboxGroup
-            label="Testing"
-            options={testingOptions}
+            label={strings.testingLabel}
+            options={getTestingOptions(lang)}
             selected={config.testing}
             onChange={v => onUpdate('testing', v)}
             columns={2}
           />
           <CheckboxGroup
-            label="Qualidade de Código"
-            options={codeQualityOptions}
+            label={strings.codeQualityLabel}
+            options={getCodeQualityOptions(lang)}
             selected={config.codeQuality}
             onChange={v => onUpdate('codeQuality', v)}
             columns={2}
@@ -261,19 +266,19 @@ export function DevForm({ config, onUpdate, promptLength, isInheriting }: DevFor
         <SectionCard
           icon={<Bot className="h-4 w-4" />}
           title={strings.aiInstructions}
-          description="Configura como o AI editor deve implementar"
+          description={strings.aiEditorDesc}
         >
           <OptionCards
-            label="AI Editor Alvo"
+            label={strings.aiEditorTargetLabel}
             value={config.aiEditor}
             onChange={v => onUpdate('aiEditor', v)}
-            options={aiEditors}
+            options={getAiEditors(lang)}
           />
           <TextField
-            label="Instruções Específicas"
+            label={strings.aiInstructionsLabel}
             value={config.aiInstructions}
             onChange={v => onUpdate('aiInstructions', v)}
-            placeholder="Ex: Implementar todos os componentes como Server Components..."
+            placeholder={strings.aiInstructionsHint}
             multiline
             rows={4}
           />
@@ -289,13 +294,14 @@ export function DevForm({ config, onUpdate, promptLength, isInheriting }: DevFor
         <SectionCard
           icon={<Rocket className="h-4 w-4" />}
           title={strings.deploy}
-          description="Target de deploy"
+          description={strings.deployTargetDesc}
         >
           <SelectField
-            label="Deploy Target"
+            label={strings.deployTargetLabel}
             value={config.deployTarget}
             onChange={v => onUpdate('deployTarget', v)}
-            options={deployTargets}
+            options={getDeployTargets(lang)}
+            placeholder={strings.selectOption}
           />
         </SectionCard>
       </DevCollapsible>
@@ -312,36 +318,37 @@ export function DevForm({ config, onUpdate, promptLength, isInheriting }: DevFor
           description={strings.automationDesc}
         >
           <OptionCards
-            label="Plataforma de Automação"
+            label={strings.automationPlatformLabel}
             value={config.automationPlatform}
             onChange={v => onUpdate('automationPlatform', v)}
-            options={automationPlatforms}
+            options={getAutomationPlatforms(lang)}
           />
           {config.automationPlatform !== 'none' && (
             <>
               <CheckboxGroup
-                label="Tipos de Trigger"
+                label={strings.triggerTypesLabel}
                 selected={config.automationTriggers}
                 onChange={v => onUpdate('automationTriggers', v)}
-                options={automationTriggers}
+                options={getAutomationTriggers(lang)}
               />
               <CheckboxGroup
-                label="Padrões de Gateway"
+                label={strings.gatewayPatternsLabel}
                 selected={config.automationGateways}
                 onChange={v => onUpdate('automationGateways', v)}
-                options={automationGateways}
+                options={getAutomationGateways(lang)}
               />
               <SelectField
-                label="Conector com a App"
+                label={strings.appConnectorLabel}
                 value={config.automationConnector}
                 onChange={v => onUpdate('automationConnector', v)}
-                options={automationConnectors}
+                options={getAutomationConnectors(lang)}
+                placeholder={strings.selectOption}
               />
               <TextField
-                label="Descrição do Workflow"
+                label={strings.workflowDescLabel}
                 value={config.automationWorkflow}
                 onChange={v => onUpdate('automationWorkflow', v)}
-                placeholder="Ex: Quando um utilizador submete um formulário..."
+                placeholder={strings.workflowDescHint}
                 multiline
                 rows={4}
               />
@@ -362,10 +369,10 @@ export function DevForm({ config, onUpdate, promptLength, isInheriting }: DevFor
           description={strings.notesDesc}
         >
           <TextField
-            label="Notas Livres"
+            label={strings.extraNotesLabel}
             value={config.extraNotes}
             onChange={v => onUpdate('extraNotes', v)}
-            placeholder="Ex: Usar a mesma estrutura existente em /src/components..."
+            placeholder={strings.extraNotesHint}
             multiline
             rows={4}
           />

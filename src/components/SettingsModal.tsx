@@ -3,8 +3,8 @@ import { X, Settings2, Globe, FileText, Code } from 'lucide-react';
 import { t } from '../core/PromptBuilder';
 import { TextField } from './TextField';
 import { SelectField } from './SelectField';
-import { appTypes, languageOptions } from '../data/options/options';
-import { aiEditors, packageManagers, deployTargets } from '../data/options/devOptions';
+import { getAppTypes, getLanguageOptions } from '../data/options/options';
+import { getAiEditors, getPackageManagers, getDeployTargets } from '../data/options/devOptions';
 
 export interface GlobalSettings {
   projectName: string;
@@ -14,7 +14,7 @@ export interface GlobalSettings {
   aiEditor: string;
   packageManager: string;
   deployTarget: string;
-  promptLanguage: 'en' | 'pt';
+  promptLanguage: string;
 }
 
 interface SettingsModalProps {
@@ -27,7 +27,7 @@ interface SettingsModalProps {
 
 export function SettingsModal({ open, onClose, currentSettings, onSave }: SettingsModalProps) {
   const [settings, setSettings] = useState<GlobalSettings>(currentSettings);
-  const lang = settings.promptLanguage;
+  const lang = (settings.promptLanguage as import('../core/i18n').Lang) || 'en';
   const strings = t(lang);
 
   // Sync state if modal opens with new current settings
@@ -64,7 +64,7 @@ export function SettingsModal({ open, onClose, currentSettings, onSave }: Settin
               <Settings2 className="h-4 w-4 text-zinc-900 dark:text-zinc-100" />
             </div>
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              {lang === 'en' ? 'Global Settings' : 'Configurações Globais'}
+              {strings.globalSettings}
             </h2>
           </div>
           <button
@@ -82,20 +82,20 @@ export function SettingsModal({ open, onClose, currentSettings, onSave }: Settin
           <div className="space-y-4">
             <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
               <FileText className="h-4 w-4" />
-              {strings.project} Identity
+              {strings.projectIdentity}
             </h3>
             <div className="space-y-4">
               <TextField 
                 label={strings.name} 
                 value={settings.projectName} 
                 onChange={v => update('projectName', v)} 
-                placeholder="Ex: meu-projeto-saas" 
+                placeholder={strings.projectNameHint} 
               />
               <TextField 
                 label={strings.description} 
                 value={settings.projectDescription} 
                 onChange={v => update('projectDescription', v)} 
-                placeholder="Ex: Uma plataforma para gestão de tarefas..." 
+                placeholder={strings.projectDescHint} 
                 multiline 
                 rows={2} 
               />
@@ -103,7 +103,7 @@ export function SettingsModal({ open, onClose, currentSettings, onSave }: Settin
                 label={strings.type} 
                 value={settings.appType} 
                 onChange={v => update('appType', v)} 
-                options={appTypes} 
+                options={getAppTypes(lang)} 
               />
             </div>
           </div>
@@ -114,26 +114,26 @@ export function SettingsModal({ open, onClose, currentSettings, onSave }: Settin
           <div className="space-y-4">
             <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
               <Code className="h-4 w-4" />
-              {lang === 'en' ? 'Development Defaults' : 'Padrões de Desenvolvimento'}
+              {strings.devDefaults}
             </h3>
             <div className="space-y-4">
               <SelectField 
-                label={lang === 'en' ? 'Target AI Editor' : 'AI Editor Alvo'} 
+                label={strings.targetAiEditor} 
                 value={settings.aiEditor} 
                 onChange={v => update('aiEditor', v)} 
-                options={aiEditors} 
+                options={getAiEditors(lang)} 
               />
               <SelectField 
-                label={lang === 'en' ? 'Package Manager' : 'Gestor de Pacotes'} 
+                label={strings.packageManager} 
                 value={settings.packageManager} 
                 onChange={v => update('packageManager', v)} 
-                options={packageManagers} 
+                options={getPackageManagers(lang)} 
               />
               <SelectField 
-                label={lang === 'en' ? 'Deployment Target' : 'Alvo de Deploy'} 
+                label={strings.deployTarget} 
                 value={settings.deployTarget} 
                 onChange={v => update('deployTarget', v)} 
-                options={deployTargets} 
+                options={getDeployTargets(lang)} 
               />
             </div>
           </div>
@@ -144,42 +144,35 @@ export function SettingsModal({ open, onClose, currentSettings, onSave }: Settin
           <div className="space-y-4">
             <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
               <Globe className="h-4 w-4" />
-              {lang === 'en' ? 'App Localization' : 'Localização do App'}
+              {strings.appLocalization}
             </h3>
             <div className="space-y-4">
               <SelectField 
                 label={strings.language} 
                 value={settings.language} 
                 onChange={v => update('language', v)} 
-                options={languageOptions} 
+                options={getLanguageOptions(lang)} 
               />
               
               {/* Output Language Toggle */}
               <div>
                 <label className="mb-1.5 block text-xs font-medium text-zinc-700 dark:text-zinc-300">
-                  {lang === 'en' ? 'Prompt Generation Language' : 'Idioma de Geração do Prompt'}
+                  {strings.promptGenLang}
                 </label>
-                <div className="flex rounded-lg border border-zinc-200 bg-zinc-50/50 p-1 dark:border-zinc-700 dark:bg-zinc-900/50">
-                  <button
-                    onClick={() => update('promptLanguage', 'pt')}
-                    className={`flex-1 rounded-md py-1.5 text-xs font-medium transition ${
-                      settings.promptLanguage === 'pt'
-                        ? 'bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-100'
-                        : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'
-                    }`}
-                  >
-                    Português (PT)
-                  </button>
-                  <button
-                    onClick={() => update('promptLanguage', 'en')}
-                    className={`flex-1 rounded-md py-1.5 text-xs font-medium transition ${
-                      settings.promptLanguage === 'en'
-                        ? 'bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-100'
-                        : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'
-                    }`}
-                  >
-                    English (EN)
-                  </button>
+                <div className="flex flex-wrap gap-2 rounded-lg border border-zinc-200 bg-zinc-50/50 p-1 dark:border-zinc-700 dark:bg-zinc-900/50">
+                  {getLanguageOptions(lang).map(opt => (
+                    <button
+                      key={opt.value}
+                      onClick={() => update('promptLanguage', opt.value)}
+                      className={`flex-1 min-w-[60px] rounded-md py-1.5 text-xs font-medium transition ${
+                        settings.promptLanguage === opt.value
+                          ? 'bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-100'
+                          : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'
+                      }`}
+                    >
+                      {opt.value.toUpperCase()}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
@@ -194,13 +187,13 @@ export function SettingsModal({ open, onClose, currentSettings, onSave }: Settin
               onClick={onClose}
               className="flex-1 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 shadow-sm ring-1 ring-inset ring-zinc-300 hover:bg-zinc-50 dark:bg-zinc-800 dark:text-zinc-300 dark:ring-zinc-700 dark:hover:bg-zinc-700 transition"
             >
-              {lang === 'en' ? 'Cancel' : 'Cancelar'}
+              {strings.cancel}
             </button>
             <button
               onClick={handleSave}
               className="flex-1 rounded-xl bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 transition"
             >
-              {lang === 'en' ? 'Save Defaults' : 'Guardar Alterações'}
+              {strings.saveDefaults}
             </button>
           </div>
         </div>

@@ -83,5 +83,5 @@ export const defaultDevConfig: DevPromptConfig = {
 
   extraNotes: '',
 
-  promptLanguage: 'pt',
+  promptLanguage: 'en',
 };
